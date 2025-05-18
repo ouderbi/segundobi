@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NC I – Sessões do Quiz (2º Bim)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif; /* Fonte Inter como padrão */
+        }
+        /* Estilo para animação suave no hover dos cards */
+        .card-hover {
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, background-color 0.3s ease-in-out;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px); /* Leve elevação no hover */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04); /* Sombra um pouco mais pronunciada */
+            background-color: #f0f9ff; /* sky-50 - um azul bem clarinho no hover */
+        }
+        .icon-brain { /* Classe específica para o ícone de cérebro */
+            font-size: 2rem; /* Ajuste o tamanho conforme necessário */
+            margin-bottom: 0.5rem; /* Espaçamento abaixo do ícone */
+        }
+         @media (min-width: 640px) { /* sm breakpoint de Tailwind */
+            .icon-brain {
+                font-size: 2.5rem; /* sm:text-5xl */
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-slate-100 text-slate-900 flex flex-col min-h-screen">
+
+    <header class="bg-white shadow-md py-5 sm:py-6">
+        <div class="container mx-auto px-4 sm:px-6 text-center">
+            <h1 class="text-3xl sm:text-4xl font-bold text-blue-600">Neurociências I – Quiz do 2º Bimestre</h1>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <div class="mb-8">
+            <a href="quiz_2bim_index.html" class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors duration-300 text-base sm:text-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 sm:w-6 sm:h-6 mr-2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+                Voltar à Seleção de Disciplinas
+            </a>
+        </div>
+
+        <div class="text-center mb-10 sm:mb-12">
+            <p class="text-lg sm:text-xl text-slate-700">Escolha uma sessão de temas abaixo.</p>
+            <p class="text-base sm:text-lg text-slate-600 mt-1">Cada sessão contém 10 questões focadas no conteúdo do segundo bimestre de Neurociências I.</p>
+        </div>
+
+        <section>
+            <h2 class="text-2xl sm:text-3xl font-semibold text-blue-500 mb-8 text-center">Sessões de Temas – NC I (2º Bimestre):</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-2 gap-6 sm:gap-8">
+                
+                <a href="nc_i_2bim_s1_tronco_nervoscran.html" class="card-hover bg-white p-6 rounded-xl shadow-lg flex flex-col items-center text-center">
+                    <div class="icon-brain text-sky-500">🧠</div>
+                    <h3 class="text-xl font-semibold text-slate-800 mb-2">Tronco Encefálico e Nervos Cranianos</h3>
+                    <p class="text-slate-600 text-sm descricao-sessao">Anatomia e funções do bulbo, ponte, mesencéfalo; N.C. I-XII.</p>
+                </a>
+
+                <a href="nc_i_2bim_s2_diencefalo_sono.html" class="card-hover bg-white p-6 rounded-xl shadow-lg flex flex-col items-center text-center">
+                    <div class="icon-brain text-sky-500">🧠</div>
+                    <h3 class="text-xl font-semibold text-slate-800 mb-2">Diencéfalo, Sono e Ritmos Cerebrais</h3>
+                    <p class="text-slate-600 text-sm descricao-sessao">Tálamo, hipotálamo, epitálamo; fisiologia do sono e EEG básico.</p>
+                </a>
+
+                <a href="nc_i_2bim_s3_sensorial_plexos.html" class="card-hover bg-white p-6 rounded-xl shadow-lg flex flex-col items-center text-center">
+                    <div class="icon-brain text-sky-500">🧠</div>
+                    <h3 class="text-xl font-semibold text-slate-800 mb-2">Sistemas Sensoriais Especiais e Plexos Nervosos</h3>
+                    <p class="text-slate-600 text-sm descricao-sessao">Vias visuais, olfatória, gustatória; plexos braquial e lombossacral.</p>
+                </a>
+
+                <a href="nc_i_2bim_s4_embriologia.html" class="card-hover bg-white p-6 rounded-xl shadow-lg flex flex-col items-center text-center">
+                    <div class="icon-brain text-sky-500">🧠</div>
+                    <h3 class="text-xl font-semibold text-slate-800 mb-2">Embriologia do Sistema Nervoso Central</h3>
+                    <p class="text-slate-600 text-sm descricao-sessao">Neurulação, vesículas encefálicas, principais malformações.</p>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-slate-200 border-t border-slate-300 py-5 sm:py-6 mt-auto">
+        <div class="container mx-auto px-4 sm:px-6 text-center">
+            <p class="text-sm text-slate-600">© <span id="currentYear"></span> – Quiz para Estudos Médicos. Foco: 2º Bimestre.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Define o ano atual no rodapé
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>

@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NC I Quiz – Embriologia do SNC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .question-card {
+            scroll-margin-top: 80px; /* Offset for sticky header */
+        }
+        .feedback-correct {
+            background-color: #d1fae5; /* Tailwind green-100 */
+            border-left: 4px solid #10b981; /* Tailwind green-500 */
+            color: #065f46; /* Tailwind green-800 */
+        }
+        .feedback-incorrect {
+            background-color: #fee2e2; /* Tailwind red-100 */
+            border-left: 4px solid #ef4444; /* Tailwind red-500 */
+            color: #991b1b; /* Tailwind red-800 */
+        }
+        /* Custom radio button appearance */
+        .custom-radio:checked {
+            background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e");
+            background-color: #2563eb; /* Tailwind blue-600 */
+            border-color: #2563eb; /* Tailwind blue-600 */
+        }
+        .custom-radio {
+            appearance: none;
+            -webkit-appearance: none;
+            border-radius: 50%;
+            border-width: 2px;
+            border-style: solid;
+            border-color: #9ca3af; /* Tailwind gray-400 */
+            width: 1.25em;
+            height: 1.25em;
+            margin-right: 0.5em;
+            position: relative;
+            top: 0.2em;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-slate-100 text-slate-900 flex flex-col min-h-screen">
+
+    <header class="bg-white shadow-md py-5 sm:py-6 sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6">
+            <h1 class="text-2xl sm:text-3xl font-bold text-blue-600 text-center">Neurociências I – Quiz: Embriologia do Sistema Nervoso Central</h1>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 sm:px-6 py-8">
+        <div class="mb-6">
+            <a href="nc_i_2bim_sessoes.html" class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors duration-300 text-base sm:text-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 sm:w-6 sm:h-6 mr-2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+                Voltar para Sessões de NC I (2º Bim)
+            </a>
+        </div>
+
+        <div id="quiz-container">
+            </div>
+
+        <div id="navigation-buttons" class="mt-8 text-center">
+            <button id="next-question-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300 hidden">
+                Próxima Questão
+            </button>
+        </div>
+
+        <div id="quiz-result" class="hidden mt-10 bg-white p-6 sm:p-8 rounded-xl shadow-xl text-center">
+            <h2 class="text-2xl sm:text-3xl font-bold text-blue-600 mb-4">Resultado Final do Quiz</h2>
+            <p id="score" class="text-xl sm:text-2xl text-slate-700 mb-2"></p>
+            <p id="percentage" class="text-lg sm:text-xl text-slate-600 mb-4"></p>
+            <p id="encouragement-message" class="text-md text-slate-600 mb-6"></p>
+            <div class="mt-6 space-y-4 sm:space-y-0 sm:flex sm:flex-wrap sm:justify-center sm:gap-4">
+                <button onclick="window.location.reload()" class="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300">
+                    Tentar Novamente
+                </button>
+                <a href="nc_i_2bim_sessoes.html" class="w-full sm:w-auto inline-block bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300">
+                    Retornar à Seleção de Sessões (NC I)
+                </a>
+                <a href="quiz_2bim_index.html" class="w-full sm:w-auto inline-block bg-slate-500 hover:bg-slate-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300">
+                    Retornar à Seleção de Disciplinas
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-slate-200 border-t border-slate-300 py-5 sm:py-6 mt-auto">
+        <div class="container mx-auto px-4 sm:px-6 text-center">
+            <p class="text-sm text-slate-600">© <span id="currentYear"></span> – Quiz para Estudos Médicos. Foco: 2º Bimestre.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Define o ano atual no rodapé
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Array de questões para a Sessão 4 de Neurociências I
+        const questions = [
+            // Questão 1
+            {
+                caseClinical: "Um recém-nascido apresenta uma malformação congênita na região lombar caracterizada pela exposição da medula espinhal e meninges, não recoberta por pele, associada a déficits neurológicos nos membros inferiores e disfunção esfincteriana. O diagnóstico é de mielomeningocele.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Mielomeningocele", 
+                    alt: "Mielomeningocele", 
+                    caption: "Ilustração de mielomeningocele, um defeito de fechamento do neuróporo posterior." 
+                },
+                statement: "A mielomeningocele é um defeito grave do tubo neural. Falhas no fechamento de qual estrutura embrionária primordial, e em que extremidade, resultam nesse tipo de malformação?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Neuróporo anterior (rostral) do tubo neural.", value: "a" },
+                    { text: "Sulco neural, antes da formação do tubo neural.", value: "b" },
+                    { text: "Crista neural, levando a defeitos na formação dos gânglios espinhais.", value: "c" },
+                    { text: "Neuróporo posterior (caudal) do tubo neural.", value: "d" },
+                    { text: "Notocorda, resultando em segmentação anormal das vértebras.", value: "e" }
+                ],
+                correctAnswer: "d",
+                justification: "A mielomeningocele resulta de uma falha no fechamento do neuróporo posterior (caudal) do tubo neural, que normalmente se fecha por volta do 27º-28º dia de gestação."
+            },
+            // Questão 2
+            {
+                caseClinical: "Durante o desenvolvimento embrionário do sistema nervoso central, após o fechamento do tubo neural, ocorrem dilatações na sua porção rostral que darão origem às principais divisões do encéfalo.",
+                 image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Vesículas+Cerebrais+Primárias", 
+                    alt: "Vesículas Cerebrais Primárias", 
+                    caption: "Esquema das três vesículas cerebrais primárias: prosencéfalo, mesencéfalo e romboencéfalo." 
+                },
+                statement: "Na fase de três vesículas primárias do desenvolvimento encefálico, quais são essas vesículas, em ordem rostrocaudal?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Telencéfalo, Diencéfalo, Mesencéfalo.", value: "a" },
+                    { text: "Prosencéfalo (Procencéfalo), Mesencéfalo, Romboencéfalo.", value: "b" },
+                    { text: "Cérebro Anterior, Cérebro Médio, Cérebro Posterior.", value: "c" },
+                    { text: "Telencéfalo, Metencéfalo, Mielencéfalo.", value: "d" },
+                    { text: "Arquencéfalo, Paleocencéfalo, Neocencéfalo.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "As três vesículas cerebrais primárias são, em ordem rostrocaudal: Prosencéfalo (cérebro anterior), Mesencéfalo (cérebro médio) e Romboencéfalo (cérebro posterior)."
+            },
+            // Questão 3
+            {
+                caseClinical: "Um feto é diagnosticado com holoprosencefalia, uma malformação cerebral complexa caracterizada pela falha na clivagem (divisão) do prosencéfalo. Isso resulta em graus variados de fusão das estruturas cerebrais anteriores.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Derivados+Prosencéfalo", 
+                    alt: "Derivados do Prosencéfalo", 
+                    caption: "Esquema mostrando a subdivisão do prosencéfalo em telencéfalo e diencéfalo." 
+                },
+                statement: "O prosencéfalo (vesícula cerebral primária anterior) normalmente se subdivide para formar duas vesículas cerebrais secundárias. Quais são essas duas vesículas secundárias e quais as principais estruturas do SNC adulto que elas originam?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Mesencéfalo (origina o mesencéfalo) e Metencéfalo (origina a ponte e o cerebelo).", value: "a" },
+                    { text: "Telencéfalo (origina os hemisférios cerebrais, incluindo córtex, núcleos da base e hipocampo) e Diencéfalo (origina o tálamo, hipotálamo, epitálamo e subtálamo).", value: "b" },
+                    { text: "Metencéfalo (origina a ponte e o cerebelo) e Mielencéfalo (origina o bulbo).", value: "c" },
+                    { text: "Diencéfalo (origina o tálamo e hipotálamo) e Mesencéfalo (origina o mesencéfalo).", value: "d" },
+                    { text: "Romboencéfalo (origina ponte, cerebelo e bulbo) e Medula Espinhal.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "O prosencéfalo se diferencia em telencéfalo (origina hemisférios cerebrais, núcleos da base, etc.) e diencéfalo (origina tálamo, hipotálamo, etc.). Holoprosencefalia é uma falha nessa clivagem."
+            },
+            // Questão 4
+            {
+                caseClinical: "Um recém-nascido apresenta anencefalia, uma malformação congênita grave e inviável, caracterizada pela ausência da maior parte do encéfalo e da calota craniana.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Anencefalia", 
+                    alt: "Anencefalia", 
+                    caption: "Ilustração de anencefalia, resultante da falha de fechamento do neuróporo anterior." 
+                },
+                statement: "A anencefalia é um tipo de defeito do tubo neural que resulta da falha de fechamento de qual estrutura embrionária e em que momento aproximado do desenvolvimento gestacional isso ocorre?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Neuróporo posterior; por volta do 27º-28º dia de gestação.", value: "a" },
+                    { text: "Notocorda; durante a gastrulação (3ª semana).", value: "b" },
+                    { text: "Neuróporo anterior (rostral); por volta do 24º-26º dia de gestação.", value: "c" },
+                    { text: "Crista neural; durante a 4ª semana, afetando a formação do crânio.", value: "d" },
+                    { text: "Vesículas ópticas; durante a 5ª semana, levando à ausência de olhos.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "A anencefalia ocorre devido à falha no fechamento do neuróporo anterior (rostral) do tubo neural, que normalmente se fecha entre o 24º e o 26º dia de gestação."
+            },
+            // Questão 5
+            {
+                caseClinical: "Durante a ultrassonografia morfológica fetal, detecta-se que o cerebelo do feto não se desenvolveu adequadamente, apresentando agenesia ou hipoplasia severa do vérmis cerebelar e dilatação cística da fossa posterior, compatível com a Malformação de Dandy-Walker.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Derivados+Metencéfalo", 
+                    alt: "Derivados do Metencéfalo", 
+                    caption: "Esquema mostrando o metencéfalo originando a ponte e o cerebelo." 
+                },
+                statement: "O cerebelo e a ponte são estruturas importantes do sistema nervoso central que se originam de qual vesícula cerebral secundária, derivada do romboencéfalo?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Telencéfalo.", value: "a" },
+                    { text: "Diencéfalo.", value: "b" },
+                    { text: "Mesencéfalo.", value: "c" },
+                    { text: "Metencéfalo.", value: "d" },
+                    { text: "Mielencéfalo.", value: "e" }
+                ],
+                correctAnswer: "d",
+                justification: "O romboencéfalo se divide em metencéfalo e mielencéfalo. O metencéfalo dá origem à ponte e ao cerebelo. O mielencéfalo origina o bulbo."
+            },
+            // Questão 6
+            {
+                caseClinical: "Um estudo sobre a migração neuronal durante o desenvolvimento cortical investiga o papel das células da glia radial como guias para os neurônios jovens que se movem da zona ventricular para suas posições finais no córtex cerebral.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Migração+Neuronal+Radial", 
+                    alt: "Migração Neuronal Radial", 
+                    caption: "Ilustração da migração neuronal radial 'de dentro para fora' no desenvolvimento cortical." 
+                },
+                statement: "A formação do córtex cerebral envolve uma sequência complexa de proliferação celular, migração neuronal e diferenciação. Qual é o padrão geral de migração dos neurônios excitatórios (glutamatérgicos) que formarão as camadas corticais, e de onde eles se originam predominantemente?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Migração tangencial a partir das eminências ganglionares do telencéfalo ventral; originam-se da zona subventricular.", value: "a" },
+                    { text: "Migração radial \"de dentro para fora\" (inside-out), onde as camadas mais jovens migram passando pelas mais antigas para ocupar posições mais superficiais; originam-se primariamente da zona ventricular/subventricular do telencéfalo dorsal.", value: "b" },
+                    { text: "Migração radial \"de fora para dentro\" (outside-in), onde as camadas mais superficiais são formadas primeiro; originam-se do teto do mesencéfalo.", value: "c" },
+                    { text: "Migração a partir da crista neural, seguindo os vasos sanguíneos; originam-se de precursores mesenquimais.", value: "d" },
+                    { text: "Proliferação local em cada camada cortical, sem necessidade de migração extensa; originam-se in situ.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "Neurônios excitatórios corticais originam-se na zona ventricular/subventricular do telencéfalo dorsal e migram radialmente em um padrão 'de dentro para fora', com camadas mais novas sobre as mais antigas."
+            },
+            // Questão 7
+            {
+                caseClinical: "Um paciente apresenta hidrocefalia comunicante, caracterizada por dilatação dos ventrículos cerebrais com livre passagem do líquido cefalorraquidiano (LCR) entre os ventrículos e o espaço subaracnóideo, mas com dificuldade na sua absorção.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Absorção+LCR+Vilosidades+Aracnoides", 
+                    alt: "Absorção do LCR", 
+                    caption: "Esquema das vilosidades aracnoides projetando-se para os seios venosos durais, local de absorção do LCR." 
+                },
+                statement: "O líquido cefalorraquidiano (LCR) é produzido principalmente pelos plexos coroides nos ventrículos cerebrais. Após circular através do sistema ventricular e emergir para o espaço subaracnóideo, onde ocorre primariamente a absorção do LCR de volta para a circulação venosa?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Nos capilares sanguíneos do parênquima cerebral.", value: "a" },
+                    { text: "Nas vilosidades aracnoides (ou granulações aracnoides) que se projetam para os seios venosos durais, especialmente o seio sagital superior.", value: "b" },
+                    { text: "No sistema linfático cervical, através de conexões diretas com o espaço subaracnóideo.", value: "c" },
+                    { text: "Pelas células ependimárias que revestem os ventrículos.", value: "d" },
+                    { text: "Pela barreira hematoencefálica ao nível dos capilares cerebrais.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "A principal via de absorção do LCR é através das vilosidades (granulações) aracnoides, que se projetam para os seios venosos durais (ex: seio sagital superior)."
+            },
+            // Questão 8
+            {
+                caseClinical: "Um casal busca aconselhamento genético devido ao nascimento anterior de um filho com um defeito do tubo neural. A suplementação com ácido fólico antes e durante o início da gestação é fortemente recomendada para prevenir a recorrência.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Neurulação+Placa+Neural", 
+                    alt: "Processo de Neurulação", 
+                    caption: "Diagrama da neurulação, mostrando a placa neural se dobrando para formar o tubo neural." 
+                },
+                statement: "A neurulação é o processo embrionário fundamental da formação do tubo neural, precursor do sistema nervoso central. Este processo envolve a transformação de qual estrutura embrionária primordial?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Do mesoderma paraxial, que forma os somitos.", value: "a" },
+                    { text: "Da notocorda, que se diferencia diretamente no tubo neural.", value: "b" },
+                    { text: "Da placa neural, uma região espessada do ectoderma dorsal, induzida pela notocorda e mesoderma adjacente.", value: "c" },
+                    { text: "Do endoderma, que forma o revestimento do tubo digestivo.", value: "d" },
+                    { text: "Da crista neural, que forma o sistema nervoso periférico.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "A neurulação começa com a formação da placa neural (espessamento do ectoderma dorsal), que se dobra para formar o sulco neural e, subsequentemente, o tubo neural."
+            },
+            // Questão 9
+            {
+                caseClinical: "Um recém-nascido é diagnosticado com espinha bífida oculta, uma forma leve de defeito do tubo neural, geralmente assintomática e descoberta incidentalmente por uma pequena tufos de pelos ou uma covinha na pele sobre a região lombar.",
+                statement: "Analise as seguintes asserções sobre os defeitos do tubo neural (DTN):\nI. A espinha bífida oculta é caracterizada por uma falha na fusão dos arcos vertebrais posteriores, mas geralmente sem herniação do tecido neural ou meninges, e a medula espinhal e as meninges permanecem em sua posição normal.\nPORQUE\nII. Todos os tipos de defeitos do tubo neural, incluindo anencefalia e mielomeningocele, são prevenidos em 100% dos casos com a suplementação adequada de ácido fólico antes e durante o início da gestação.",
+                type: "assertion-reason",
+                options: [
+                    { text: "As asserções I e II são proposições verdadeiras, e a II é uma justificativa correta da I.", value: "a" },
+                    { text: "As asserções I e II são proposições verdadeiras, mas a II não é uma justificativa correta da I.", value: "b" },
+                    { text: "A asserção I é uma proposição verdadeira, e a II é uma proposição falsa.", value: "c" },
+                    { text: "A asserção I é uma proposição falsa, e a II é uma proposição verdadeira.", value: "d" },
+                    { text: "As asserções I e II são proposições falsas.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "I é verdadeira: descreve corretamente a espinha bífida oculta. II é falsa: o ácido fólico reduz significativamente o risco, mas não previne 100% dos DTNs."
+            },
+            // Questão 10
+            {
+                caseClinical: "O desenvolvimento do sistema nervoso central é um processo altamente organizado que depende da correta especificação regional e diferenciação celular. As vesículas encefálicas secundárias dão origem a todas as principais divisões do encéfalo adulto.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Vesículas+Encefálicas+e+Derivados", 
+                    alt: "Vesículas Encefálicas e Derivados", 
+                    caption: "Esquema das vesículas encefálicas primárias e secundárias e as estruturas adultas que originam." 
+                },
+                statement: "Qual das seguintes estruturas do SNC adulto NÃO é derivada do romboencéfalo (que se divide em metencéfalo e mielencéfalo)?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Ponte.", value: "a" },
+                    { text: "Cerebelo.", value: "b" },
+                    { text: "Bulbo (Medula Oblonga).", value: "c" },
+                    { text: "Mesencéfalo (Tectum, Tegmento, Pedúnculos Cerebrais).", value: "d" },
+                    { text: "Quarto ventrículo (sua cavidade).", value: "e" }
+                ],
+                correctAnswer: "d",
+                justification: "O romboencéfalo origina o metencéfalo (ponte e cerebelo) e o mielencéfalo (bulbo), e sua cavidade forma o quarto ventrículo. O mesencéfalo é uma vesícula primária distinta que origina o mesencéfalo adulto."
+            }
+        ];
+
+        // Variáveis globais do quiz
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answerConfirmed = false; 
+
+        // Elementos do DOM (serão obtidos na inicialização)
+        let quizContainer;
+        let nextQuestionBtn;
+        let quizResultContainer;
+        let scoreElement;
+        let percentageElement;
+        let encouragementMessageElement;
+        // let nextSessionLink; // Removido pois esta é a última sessão de NC I
+
+        /**
+         * Exibe a questão atual na tela.
+         * @param {number} index - O índice da questão a ser exibida.
+         */
+        function displayQuestion(index) {
+            answerConfirmed = false; 
+            const q = questions[index];
+            let optionsHtml = '';
+
+            if (!q) { 
+                console.error("Questão não encontrada no índice:", index);
+                if (questions.length > 0) { 
+                     showResults();
+                } else { 
+                    if(quizContainer) quizContainer.innerHTML = "<p class='text-center text-red-500'>Nenhuma questão carregada para este quiz.</p>";
+                }
+                return;
+            }
+
+            if (q.type === "multiple-choice" || q.type === "assertion-reason") {
+                q.options.forEach(option => {
+                    optionsHtml += `
+                        <label class="block bg-slate-50 hover:bg-sky-100 p-4 rounded-lg border border-slate-200 mb-3 cursor-pointer transition-colors duration-200">
+                            <input type="radio" name="question${index}" value="${option.value}" class="custom-radio">
+                            <span class="text-slate-700">${option.text}</span>
+                        </label>
+                    `;
+                });
+            }
+            // Adicionar lógica para outros tipos de questão se necessário
+            
+            if(quizContainer) { 
+                quizContainer.innerHTML = `
+                    <div class="question-card bg-white p-6 sm:p-8 rounded-xl shadow-xl" id="q_card_${index}">
+                        <p class="text-sm text-slate-500 mb-1">Questão ${index + 1} de ${questions.length}</p>
+                        ${q.caseClinical ? `<div class="mb-4 p-4 bg-sky-50 rounded-md text-slate-700 text-sm sm:text-base italic">${q.caseClinical}</div>` : ''}
+                        ${q.image ? `
+                            <div class="my-4 text-center">
+                                <img src="${q.image.src}" alt="${q.image.alt}" class="max-w-full h-auto mx-auto rounded-lg shadow-sm border border-slate-200" onerror="this.onerror=null; this.src='https://placehold.co/600x300/e2e8f0/64748b?text=Imagem+Indisponível'; this.alt='Imagem indisponível';">
+                                ${q.image.caption ? `<p class="text-xs text-slate-500 mt-2">${q.image.caption}</p>` : ''}
+                            </div>` : ''}
+                        <p class="font-semibold text-slate-800 mb-5 text-base sm:text-lg whitespace-pre-line">${q.statement}</p>
+                        <div class="options-container">${optionsHtml}</div>
+                        <button onclick="confirmAnswer(${index})" class="confirm-btn mt-6 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md transition-colors duration-300">
+                            Confirmar Resposta
+                        </button>
+                        <div class="feedback-area mt-4 p-4 rounded-md hidden text-sm sm:text-base"></div>
+                    </div>
+                `;
+            }
+            if(nextQuestionBtn) nextQuestionBtn.classList.add('hidden'); 
+            
+            const cardElement = document.getElementById(`q_card_${index}`);
+            if (cardElement) {
+                 cardElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        /**
+         * Confirma a resposta do usuário, calcula a pontuação e exibe o feedback.
+         * @param {number} index - O índice da questão atual.
+         */
+        function confirmAnswer(index) {
+            if (answerConfirmed) return; 
+
+            const q = questions[index];
+            if (!q) { 
+                console.error("Tentativa de confirmar resposta para questão inexistente:", index);
+                return;
+            }
+            const feedbackDiv = quizContainer ? quizContainer.querySelector(`#q_card_${index} .feedback-area`) : null;
+            const confirmBtn = quizContainer ? quizContainer.querySelector(`#q_card_${index} .confirm-btn`) : null;
+            let isCorrect = false;
+            
+            if (q.type === "multiple-choice" || q.type === "assertion-reason") {
+                const selectedOption = quizContainer ? quizContainer.querySelector(`input[name="question${index}"]:checked`) : null;
+                if (!selectedOption) { 
+                    if (feedbackDiv) {
+                        feedbackDiv.innerHTML = '<p class="font-semibold">Por favor, selecione uma alternativa.</p>';
+                        feedbackDiv.className = 'feedback-area mt-4 p-4 rounded-md bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700';
+                        feedbackDiv.classList.remove('hidden');
+                    }
+                    return;
+                }
+                isCorrect = selectedOption.value === q.correctAnswer;
+            }
+            // Adicionar lógica para outros tipos de questão se necessário
+            
+            if (feedbackDiv) { 
+                if (isCorrect) {
+                    score++;
+                    feedbackDiv.innerHTML = `<p class="font-semibold mb-1">Resposta Correta!</p><p>${q.justification}</p>`;
+                    feedbackDiv.className = 'feedback-area mt-4 p-4 rounded-md feedback-correct';
+                } else {
+                    feedbackDiv.innerHTML = `<p class="font-semibold mb-1">Resposta Incorreta.</p><p><strong>Justificativa:</strong> ${q.justification}</p>`;
+                    feedbackDiv.className = 'feedback-area mt-4 p-4 rounded-md feedback-incorrect';
+                }
+                feedbackDiv.classList.remove('hidden');
+            }
+
+            if (confirmBtn) { 
+                confirmBtn.disabled = true; 
+                confirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+            answerConfirmed = true; 
+
+            if (quizContainer) {
+                const inputs = quizContainer.querySelectorAll(`#q_card_${index} input[type="radio"]`);
+                inputs.forEach(input => input.disabled = true);
+            }
+
+            if (currentQuestionIndex < questions.length - 1) {
+                if(nextQuestionBtn) nextQuestionBtn.classList.remove('hidden');
+            } else {
+                showResults();
+            }
+        }
+
+        /**
+         * Manipula o clique no botão "Próxima Questão".
+         */
+        function handleNextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                displayQuestion(currentQuestionIndex);
+            }
+        }
+        
+        /**
+         * Exibe o resultado final do quiz.
+         */
+        function showResults() {
+            if (quizContainer) quizContainer.classList.add('hidden'); 
+            if (nextQuestionBtn) nextQuestionBtn.classList.add('hidden'); 
+            if (quizResultContainer) quizResultContainer.classList.remove('hidden');
+            
+            if (questions.length > 0) { 
+                 const calculatedPercentage = (score / questions.length) * 100;
+                 if (scoreElement) scoreElement.textContent = `Você acertou ${score} de ${questions.length} questões.`;
+                 if (percentageElement) percentageElement.textContent = `Seu aproveitamento: ${calculatedPercentage.toFixed(1)}%`;
+                 
+                 if (encouragementMessageElement) {
+                    if (calculatedPercentage >= 70) {
+                        encouragementMessageElement.textContent = "Parabéns! Você concluiu todas as sessões de Neurociências I com um ótimo desempenho!";
+                    } else if (calculatedPercentage >= 50) {
+                        encouragementMessageElement.textContent = "Bom trabalho ao finalizar as sessões de Neurociências I! Continue revisando os temas.";
+                    } else {
+                        encouragementMessageElement.textContent = "Você completou todas as sessões de Neurociências I! Reveja os pontos de maior dificuldade para consolidar o aprendizado.";
+                    }
+                 }
+
+            } else {
+                if (scoreElement) scoreElement.textContent = "Nenhuma questão foi carregada.";
+                if (percentageElement) percentageElement.textContent = "Aproveitamento: N/A";
+                if (encouragementMessageElement) encouragementMessageElement.textContent = "Não há questões nesta sessão.";
+            }
+            
+            // Como esta é a última sessão de NC I, não há botão "Próxima Sessão" para NC I.
+            // Os links para "Retornar à Seleção de Sessões (NC I)" e "Retornar à Seleção de Disciplinas" já estão no HTML.
+
+            if (quizResultContainer) {
+                quizResultContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // Inicia o Quiz exibindo a primeira questão, se houver alguma.
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeQuizSession();
+        });
+        
+        function initializeQuizSession() {
+            quizContainer = document.getElementById('quiz-container');
+            nextQuestionBtn = document.getElementById('next-question-btn');
+            quizResultContainer = document.getElementById('quiz-result');
+            scoreElement = document.getElementById('score');
+            percentageElement = document.getElementById('percentage');
+            encouragementMessageElement = document.getElementById('encouragement-message');
+            // nextSessionLink não é necessário aqui pois é a última sessão da disciplina
+
+            currentQuestionIndex = 0;
+            score = 0;
+            answerConfirmed = false;
+
+            if (quizResultContainer) quizResultContainer.classList.add('hidden');
+            if (nextQuestionBtn) {
+                 nextQuestionBtn.classList.add('hidden');
+                 nextQuestionBtn.addEventListener('click', handleNextQuestion); // Adiciona listener aqui
+            }
+            if (quizContainer) quizContainer.classList.remove('hidden');
+
+            if (questions && questions.length > 0) {
+                displayQuestion(currentQuestionIndex);
+            } else {
+                if (quizContainer) {
+                    quizContainer.innerHTML = "<p class='text-center text-xl text-slate-700 mt-10'>Nenhuma questão disponível para esta sessão no momento.</p>";
+                }
+                showResults();
+            }
+        }
+    </script>
+
+</body>
+</html>

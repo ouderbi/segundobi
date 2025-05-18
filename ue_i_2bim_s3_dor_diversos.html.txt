@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>U&E I Quiz – Dor e Temas Diversos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .question-card {
+            scroll-margin-top: 80px; /* Offset for sticky header */
+        }
+        .feedback-correct {
+            background-color: #d1fae5; /* Tailwind green-100 */
+            border-left: 4px solid #10b981; /* Tailwind green-500 */
+            color: #065f46; /* Tailwind green-800 */
+        }
+        .feedback-incorrect {
+            background-color: #fee2e2; /* Tailwind red-100 */
+            border-left: 4px solid #ef4444; /* Tailwind red-500 */
+            color: #991b1b; /* Tailwind red-800 */
+        }
+        /* Custom radio button appearance */
+        .custom-radio:checked {
+            background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e");
+            background-color: #2563eb; /* Tailwind blue-600 */
+            border-color: #2563eb; /* Tailwind blue-600 */
+        }
+        .custom-radio {
+            appearance: none;
+            -webkit-appearance: none;
+            border-radius: 50%;
+            border-width: 2px;
+            border-style: solid;
+            border-color: #9ca3af; /* Tailwind gray-400 */
+            width: 1.25em;
+            height: 1.25em;
+            margin-right: 0.5em;
+            position: relative;
+            top: 0.2em;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-slate-100 text-slate-900 flex flex-col min-h-screen">
+
+    <header class="bg-white shadow-md py-5 sm:py-6 sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6">
+            <h1 class="text-2xl sm:text-3xl font-bold text-red-600 text-center">U&E I – Quiz: Manejo da Dor em Urgências e Temas Diversos</h1>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 sm:px-6 py-8">
+        <div class="mb-6">
+            <a href="ue_i_2bim_sessoes.html" class="inline-flex items-center text-red-600 hover:text-red-800 transition-colors duration-300 text-base sm:text-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 sm:w-6 sm:h-6 mr-2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+                Voltar para Sessões de U&E I (2º Bim)
+            </a>
+        </div>
+
+        <div id="quiz-container">
+            </div>
+
+        <div id="navigation-buttons" class="mt-8 text-center">
+            <button id="next-question-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300 hidden">
+                Próxima Questão
+            </button>
+        </div>
+
+        <div id="quiz-result" class="hidden mt-10 bg-white p-6 sm:p-8 rounded-xl shadow-xl text-center">
+            <h2 class="text-2xl sm:text-3xl font-bold text-red-600 mb-4">Resultado Final do Quiz</h2>
+            <p id="score" class="text-xl sm:text-2xl text-slate-700 mb-2"></p>
+            <p id="percentage" class="text-lg sm:text-xl text-slate-600 mb-4"></p>
+            <p id="encouragement-message" class="text-md text-slate-600 mb-6"></p>
+            <div class="mt-6 space-y-4 sm:space-y-0 sm:flex sm:flex-wrap sm:justify-center sm:gap-4">
+                <button onclick="window.location.reload()" class="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300">
+                    Tentar Novamente
+                </button>
+                <a href="ue_i_2bim_sessoes.html" class="w-full sm:w-auto inline-block bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300">
+                    Retornar à Seleção de Sessões (U&E I)
+                </a>
+                <a href="quiz_2bim_index.html" class="w-full sm:w-auto inline-block bg-slate-500 hover:bg-slate-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300">
+                    Retornar à Seleção de Disciplinas
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-slate-200 border-t border-slate-300 py-5 sm:py-6 mt-auto">
+        <div class="container mx-auto px-4 sm:px-6 text-center">
+            <p class="text-sm text-slate-600">© <span id="currentYear"></span> – Quiz para Estudos Médicos. Foco: 2º Bimestre.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Define o ano atual no rodapé
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Array de questões para a Sessão 3 de Urgência e Emergência I
+        const questions = [
+            // Questão 1
+            {
+                caseClinical: "Um paciente de 55 anos, tabagista e hipertenso, procura o pronto-socorro com queixa de dor torácica de forte intensidade, em aperto, retroesternal, iniciada há 1 hora, com irradiação para o membro superior esquerdo e mandíbula, acompanhada de sudorese fria e dispneia.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Dor+Torácica+SCA", 
+                    alt: "Dor Torácica Sugestiva de SCA", 
+                    caption: "Ilustração das características e irradiação da dor na Síndrome Coronariana Aguda." 
+                },
+                statement: "A dor torácica é uma queixa comum em serviços de urgência e pode representar uma ampla gama de diagnósticos, desde condições benignas até emergenciais com risco de vida. No contexto do paciente descrito, quais características da dor (sinais de alerta) são MAIS sugestivas de uma síndrome coronariana aguda (SCA) e exigem investigação imediata?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Dor bem localizada, pontual, tipo \"agulhada\", que piora com a palpação do tórax e melhora com analgésicos comuns.", value: "a" },
+                    { text: "Dor em aperto, pressão ou queimação, retroesternal, com irradiação para membro superior esquerdo, mandíbula ou dorso, associada a sintomas como dispneia, sudorese, náuseas, com duração geralmente superior a 20 minutos.", value: "b" },
+                    { text: "Dor pleurítica (que piora com a inspiração profunda ou tosse), associada a febre e expectoração purulenta.", value: "c" },
+                    { text: "Dor epigástrica tipo queimação, que melhora com antiácidos e piora com o jejum.", value: "d" },
+                    { text: "Dor de início gradual, que dura poucos segundos, e está claramente relacionada a esforço físico específico, aliviando rapidamente com o repouso.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "Dor em aperto, retroesternal, com irradiação para MSE/mandíbula/dorso, associada a dispneia, sudorese, náuseas e duração >20 min são sinais clássicos de SCA."
+            },
+            // Questão 2
+            {
+                caseClinical: "Uma paciente de 30 anos, previamente hígida, apresenta-se na emergência com cefaleia de início súbito, descrita como \"a pior dor de cabeça da vida\", de intensidade 10/10, acompanhada de rigidez de nuca, fotofobia e vômitos. Não há história de trauma recente.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Cefaleia+em+Trovoada+HSA", 
+                    alt: "Cefaleia em Trovoada e HSA", 
+                    caption: "Ilustração do conceito de 'thunderclap headache' e sua associação com Hemorragia Subaracnóidea." 
+                },
+                statement: "A cefaleia de início súbito e de extrema intensidade (\"thunderclap headache\") é um importante sinal de alerta em neurologia. Qual das seguintes condições representa a principal emergência neurológica que deve ser prontamente investigada e excluída em um paciente com essas características?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Enxaqueca com aura.", value: "a" },
+                    { text: "Cefaleia tensional episódica.", value: "b" },
+                    { text: "Hemorragia subaracnóidea (HSA) espontânea, frequentemente por ruptura de aneurisma cerebral.", value: "c" },
+                    { text: "Sinusite aguda maxilar.", value: "d" },
+                    { text: "Neuralgia do trigêmeo.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "Cefaleia em trovoada ('a pior da vida', início súbito) é o sintoma cardinal da hemorragia subaracnóidea (HSA), uma emergência neurológica grave."
+            },
+            // Questão 3
+            {
+                caseClinical: "Um paciente de 60 anos, com história de etilismo crônico, é trazido à emergência com dor abdominal difusa e intensa, de início agudo, localizada principalmente em andar superior do abdômen, com irradiação para o dorso (\"em faixa\"), acompanhada de náuseas e vômitos persistentes. Ao exame, apresenta-se taquicárdico, hipotenso e com abdômen distendido e doloroso à palpação.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Pancreatite+Aguda+Sintomas", 
+                    alt: "Sintomas da Pancreatite Aguda", 
+                    caption: "Ilustração da dor 'em faixa' e outros sintomas da pancreatite aguda, com destaque para amilase/lipase." 
+                },
+                statement: "O quadro clínico descrito levanta forte suspeita de pancreatite aguda. Qual dos seguintes achados laboratoriais, quando significativamente elevado (geralmente > 3 vezes o limite superior da normalidade), é um marcador bioquímico importante e relativamente específico para o diagnóstico de pancreatite aguda?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Creatinofosfoquinase (CPK) e sua fração MB (CK-MB).", value: "a" },
+                    { text: "Transaminases hepáticas (AST/TGO e ALT/TGP).", value: "b" },
+                    { text: "Amilase e/ou Lipase séricas.", value: "c" },
+                    { text: "Bilirrubinas totais e frações.", value: "d" },
+                    { text: "Gama-glutamil transferase (GGT) e fosfatase alcalina.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "A elevação da amilase e/ou lipase séricas (lipase mais específica) > 3x o LSN é um critério diagnóstico chave para pancreatite aguda, junto com a dor característica."
+            },
+            // Questão 4
+            {
+                caseClinical: "Uma mulher jovem chega ao pronto-atendimento com dor súbita e lancinante em fossa ilíaca direita, acompanhada de sangramento vaginal discreto. Ela refere atraso menstrual de 6 semanas. Ao exame, apresenta dor à palpação profunda da fossa ilíaca direita e sinais de irritação peritoneal. PA 90/60 mmHg, FC 110 bpm.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Gravidez+Ectópica+Rota", 
+                    alt: "Gravidez Ectópica Rota", 
+                    caption: "Ilustração de gravidez ectópica rota, uma emergência ginecológica." 
+                },
+                statement: "Em uma mulher em idade fértil com dor abdominal aguda e atraso menstrual, qual emergência ginecológica com potencial risco de vida deve ser SEMPRE considerada e investigada prioritariamente?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Doença inflamatória pélvica (DIP) aguda.", value: "a" },
+                    { text: "Cisto ovariano roto funcional.", value: "b" },
+                    { text: "Gravidez ectópica rota (ou em vias de romper).", value: "c" },
+                    { text: "Endometriose com sangramento agudo.", value: "d" },
+                    { text: "Apendicite aguda.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "Dor abdominal aguda, atraso menstrual e instabilidade hemodinâmica em mulher em idade fértil são altamente sugestivos de gravidez ectópica rota, uma emergência cirúrgica."
+            },
+            // Questão 5
+            {
+                caseClinical: "Um paciente idoso, acamado e com múltiplas comorbidades, desenvolve dor súbita e intensa em um dos membros inferiores, que se apresenta pálido, frio, sem pulsos distais palpáveis e com parestesia.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=6+Ps+Isquemia+Arterial", 
+                    alt: "6 Ps da Isquemia Arterial Aguda", 
+                    caption: "Ilustração dos 6 Ps de Pallen característicos da isquemia arterial aguda de membro." 
+                },
+                statement: "Este quadro agudo é altamente sugestivo de isquemia arterial aguda do membro (IAM). A avaliação da dor em um paciente com suspeita de IAM é crucial. Além da dor intensa, quais são os outros componentes clássicos dos \"6 Ps de Pallen\" que caracterizam a IAM?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Palpitação, Pletora, Prurido, Pirose, Paralisia, Polaciúria.", value: "a" },
+                    { text: "Palidez, Ausência de Pulso (Pulselessness), Parestesia, Paralisia, Poiquilotermia (Perishingly cold), Dor (Pain).", value: "b" },
+                    { text: "Púrpura, Petéquias, Pressão arterial elevada, Pigarro, Paresia, Pneumotórax.", value: "c" },
+                    { text: "Proptose, Ptose, Paresia facial, Polidipsia, Poliúria, Perda de peso.", value: "d" },
+                    { text: "Pápulas, Placas, Pústulas, Prurido intenso, Penfigoide, Psoríase.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "Os 6 Ps da isquemia arterial aguda são: Pain (Dor), Pulselessness (Ausência de pulso), Pallor (Palidez), Paresthesia (Parestesia), Paralysis (Paralisia) e Poikilothermia (Membro frio)."
+            },
+            // Questão 6
+            {
+                caseClinical: "Uma equipe de socorristas é chamada para atender uma vítima de um acidente de trânsito em uma rodovia escura e com neblina. Há destroços espalhados pela pista e o tráfego continua fluindo, embora lentamente.",
+                statement: "No atendimento a vítimas de trauma, a avaliação da \"Segurança da Cena\" é o primeiro passo. Qual das seguintes ações é a mais importante para garantir a segurança da equipe e da vítima em um cenário como o descrito?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Iniciar imediatamente a triagem das vítimas para determinar a prioridade de atendimento.", value: "a" },
+                    { text: "Sinalizar adequadamente o local do acidente (cones, triângulo, luzes de alerta da ambulância), alertar o controle de tráfego ou a polícia rodoviária para auxiliar na interdição ou controle do fluxo de veículos, e garantir iluminação adequada antes de abordar as vítimas.", value: "b" },
+                    { text: "Remover rapidamente as vítimas dos veículos e levá-las para o acostamento, mesmo sem imobilização cervical completa, para evitar novos acidentes.", value: "c" },
+                    { text: "Utilizar equipamentos de proteção individual (EPIs) como luvas e óculos, mas prosseguir rapidamente com o atendimento para não perder tempo.", value: "d" },
+                    { text: "Concentrar-se apenas na vítima mais grave, ignorando os riscos ambientais para otimizar o socorro.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "Em cena de acidente em rodovia com baixa visibilidade, a sinalização, controle de tráfego e iluminação são cruciais para a segurança antes de abordar as vítimas."
+            },
+            // Questão 7
+            {
+                caseClinical: "Um médico regulador do SAMU recebe uma chamada de uma mãe aflita, relatando que seu filho de 2 anos engasgou com uma pequena peça de brinquedo e está com dificuldade respiratória intensa, cianótico e com estridor.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Manobras+Desobstrução+OVACE", 
+                    alt: "Manobras de Desobstrução de Vias Aéreas", 
+                    caption: "Ilustração das manobras de desobstrução de vias aéreas em crianças/lactentes." 
+                },
+                statement: "Diante desta chamada de alta prioridade, qual é a sequência de ações MAIS apropriada para o médico regulador?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Tranquilizar a mãe, agendar uma consulta pediátrica para o dia seguinte e orientar observação.", value: "a" },
+                    { text: "Orientar a mãe a tentar remover o objeto com os dedos às cegas, enquanto envia uma ambulância de suporte básico (USB) sem urgência.", value: "b" },
+                    { text: "Identificar o endereço, despachar imediatamente uma Unidade de Suporte Avançado (USA) com médico, e, simultaneamente, fornecer orientações claras e calmas à mãe sobre como realizar as manobras de desobstrução de vias aéreas para lactentes/crianças (tapotagem/compressões), adaptadas à idade, até a chegada da equipe.", value: "c" },
+                    { text: "Informar à mãe que o SAMU não atende casos de engasgo e orientá-la a levar a criança por meios próprios ao hospital mais próximo.", value: "d" },
+                    { text: "Apenas registrar a ocorrência e aguardar que a família resolva a situação ou procure outro meio de transporte.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "OVACE grave em criança é emergência. O regulador deve despachar USA e, simultaneamente, orientar manobras de desobstrução por telefone."
+            },
+            // Questão 8
+            {
+                caseClinical: "Você presencia um colega de trabalho, que sabidamente tem epilepsia, iniciar uma crise convulsiva tônico-clônica no escritório. Ele cai da cadeira e começa a se debater no chão.",
+                statement: "Durante os primeiros socorros a uma pessoa em crise convulsiva tônico-clônica, qual das seguintes ações NÃO deve ser realizada?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Proteger a cabeça da pessoa, colocando algo macio sob ela, se possível.", value: "a" },
+                    { text: "Afastar objetos próximos que possam causar ferimentos.", value: "b" },
+                    { text: "Tentar introduzir uma caneta ou os dedos na boca da pessoa para evitar que ela morda a língua.", value: "c" },
+                    { text: "Afrouxar roupas apertadas, como colarinhos ou gravatas.", value: "d" },
+                    { text: "Após a cessação dos movimentos, se houver salivação ou vômito, lateralizar a cabeça ou o corpo da pessoa.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "NÃO se deve introduzir objetos na boca durante uma convulsão. Isso pode causar lesões, obstrução de via aérea ou mordeduras. As outras opções são corretas."
+            },
+            // Questão 9
+            {
+                caseClinical: "Um ciclista é atingido lateralmente por um carro em baixa velocidade. Ele é lançado da bicicleta e cai sobre o lado direito do corpo. Queixa-se de dor intensa na região costal direita e dificuldade para respirar profundamente.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Trauma+Torácico+Pneumotórax", 
+                    alt: "Trauma Torácico e Pneumotórax", 
+                    caption: "Ilustração de trauma torácico e possível desenvolvimento de pneumotórax/hemotórax." 
+                },
+                statement: "Considerando o mecanismo de trauma (impacto lateral no tórax) e os sintomas, qual tipo de lesão torácica deve ser fortemente suspeitada e investigada, além de possíveis fraturas de costelas?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Tamponamento cardíaco.", value: "a" },
+                    { text: "Pneumotórax (simples ou hipertensivo) e/ou hemotórax.", value: "b" },
+                    { text: "Ruptura de baço com dor referida.", value: "c" },
+                    { text: "Contusão renal direita.", value: "d" },
+                    { text: "Fratura de clavícula isolada.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "Trauma torácico contuso com impacto lateral e dor/dispneia sugere fortemente lesões pleuropulmonares como pneumotórax ou hemotórax."
+            },
+            // Questão 10
+            {
+                caseClinical: "Um familiar liga para você, médico, e descreve que seu avô, de 78 anos, acordou há 30 minutos com o \"rosto torto\" (desvio da comissura labial), dificuldade para levantar o braço esquerdo e falando \"embolado\".",
+                statement: "Qual é a sua orientação MAIS IMPORTANTE e IMEDIATA para este familiar, considerando a suspeita de um Acidente Vascular Encefálico (AVE) agudo?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Acalmar o familiar, orientar que o avô repouse, aguarde algumas horas para ver se os sintomas melhoram espontaneamente e, se persistirem, procurar um posto de saúde no dia seguinte.", value: "a" },
+                    { text: "Orientar a administração de um analgésico comum para o avô e observar a evolução dos sintomas por mais 2 horas antes de tomar qualquer atitude.", value: "b" },
+                    { text: "Recomendar que levem o avô imediatamente ao pronto-socorro de um hospital que tenha capacidade para atendimento neurológico de urgência (idealmente um centro de AVE) ou acionar o serviço de atendimento móvel de urgência (SAMU 192) o mais rápido possível, informando a suspeita de AVE e o horário de início dos sintomas (ou o último horário em que foi visto bem).", value: "c" },
+                    { text: "Sugerir que verifiquem a pressão arterial do avô em casa e, se estiver alta, administrem um anti-hipertensivo que ele já possua, antes de procurar o serviço médico.", value: "d" },
+                    { text: "Perguntar sobre outros sintomas, como febre ou dor de cabeça, para tentar diferenciar de outras condições menos urgentes antes de recomendar qualquer ação.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "Na suspeita de AVE agudo, a orientação crucial é o encaminhamento imediato para um serviço de emergência adequado ou acionamento do SAMU. 'Tempo é cérebro'."
+            }
+        ];
+
+        // Variáveis globais do quiz
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answerConfirmed = false; 
+
+        // Elementos do DOM (serão obtidos na inicialização)
+        let quizContainer;
+        let nextQuestionBtn;
+        let quizResultContainer;
+        let scoreElement;
+        let percentageElement;
+        let encouragementMessageElement;
+        // let nextSessionLink; // Removido pois esta é a última sessão de U&E I
+
+        /**
+         * Exibe a questão atual na tela.
+         * @param {number} index - O índice da questão a ser exibida.
+         */
+        function displayQuestion(index) {
+            answerConfirmed = false; 
+            const q = questions[index];
+            let optionsHtml = '';
+
+            if (!q) { 
+                console.error("Questão não encontrada no índice:", index);
+                if (questions.length > 0) { 
+                     showResults();
+                } else { 
+                    if(quizContainer) quizContainer.innerHTML = "<p class='text-center text-red-500'>Nenhuma questão carregada para este quiz.</p>";
+                }
+                return;
+            }
+
+            if (q.type === "multiple-choice" || q.type === "assertion-reason") {
+                q.options.forEach(option => {
+                    optionsHtml += `
+                        <label class="block bg-slate-50 hover:bg-sky-100 p-4 rounded-lg border border-slate-200 mb-3 cursor-pointer transition-colors duration-200">
+                            <input type="radio" name="question${index}" value="${option.value}" class="custom-radio">
+                            <span class="text-slate-700">${option.text}</span>
+                        </label>
+                    `;
+                });
+            }
+            // Adicionar lógica para outros tipos de questão se necessário
+            
+            if(quizContainer) { 
+                quizContainer.innerHTML = `
+                    <div class="question-card bg-white p-6 sm:p-8 rounded-xl shadow-xl" id="q_card_${index}">
+                        <p class="text-sm text-slate-500 mb-1">Questão ${index + 1} de ${questions.length}</p>
+                        ${q.caseClinical ? `<div class="mb-4 p-4 bg-sky-50 rounded-md text-slate-700 text-sm sm:text-base italic">${q.caseClinical}</div>` : ''}
+                        ${q.image ? `
+                            <div class="my-4 text-center">
+                                <img src="${q.image.src}" alt="${q.image.alt}" class="max-w-full h-auto mx-auto rounded-lg shadow-sm border border-slate-200" onerror="this.onerror=null; this.src='https://placehold.co/600x300/e2e8f0/64748b?text=Imagem+Indisponível'; this.alt='Imagem indisponível';">
+                                ${q.image.caption ? `<p class="text-xs text-slate-500 mt-2">${q.image.caption}</p>` : ''}
+                            </div>` : ''}
+                        <p class="font-semibold text-slate-800 mb-5 text-base sm:text-lg whitespace-pre-line">${q.statement}</p>
+                        <div class="options-container">${optionsHtml}</div>
+                        <button onclick="confirmAnswer(${index})" class="confirm-btn mt-6 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md transition-colors duration-300">
+                            Confirmar Resposta
+                        </button>
+                        <div class="feedback-area mt-4 p-4 rounded-md hidden text-sm sm:text-base"></div>
+                    </div>
+                `;
+            }
+            if(nextQuestionBtn) nextQuestionBtn.classList.add('hidden'); 
+            
+            const cardElement = document.getElementById(`q_card_${index}`);
+            if (cardElement) {
+                 cardElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        /**
+         * Confirma a resposta do usuário, calcula a pontuação e exibe o feedback.
+         * @param {number} index - O índice da questão atual.
+         */
+        function confirmAnswer(index) {
+            if (answerConfirmed) return; 
+
+            const q = questions[index];
+            if (!q) { 
+                console.error("Tentativa de confirmar resposta para questão inexistente:", index);
+                return;
+            }
+            const feedbackDiv = quizContainer ? quizContainer.querySelector(`#q_card_${index} .feedback-area`) : null;
+            const confirmBtn = quizContainer ? quizContainer.querySelector(`#q_card_${index} .confirm-btn`) : null;
+            let isCorrect = false;
+            
+            if (q.type === "multiple-choice" || q.type === "assertion-reason") {
+                const selectedOption = quizContainer ? quizContainer.querySelector(`input[name="question${index}"]:checked`) : null;
+                if (!selectedOption) { 
+                    if (feedbackDiv) {
+                        feedbackDiv.innerHTML = '<p class="font-semibold">Por favor, selecione uma alternativa.</p>';
+                        feedbackDiv.className = 'feedback-area mt-4 p-4 rounded-md bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700';
+                        feedbackDiv.classList.remove('hidden');
+                    }
+                    return;
+                }
+                isCorrect = selectedOption.value === q.correctAnswer;
+            }
+            // Adicionar lógica para outros tipos de questão se necessário
+            
+            if (feedbackDiv) { 
+                if (isCorrect) {
+                    score++;
+                    feedbackDiv.innerHTML = `<p class="font-semibold mb-1">Resposta Correta!</p><p>${q.justification}</p>`;
+                    feedbackDiv.className = 'feedback-area mt-4 p-4 rounded-md feedback-correct';
+                } else {
+                    feedbackDiv.innerHTML = `<p class="font-semibold mb-1">Resposta Incorreta.</p><p><strong>Justificativa:</strong> ${q.justification}</p>`;
+                    feedbackDiv.className = 'feedback-area mt-4 p-4 rounded-md feedback-incorrect';
+                }
+                feedbackDiv.classList.remove('hidden');
+            }
+
+            if (confirmBtn) { 
+                confirmBtn.disabled = true; 
+                confirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+            answerConfirmed = true; 
+
+            if (quizContainer) {
+                const inputs = quizContainer.querySelectorAll(`#q_card_${index} input[type="radio"]`);
+                inputs.forEach(input => input.disabled = true);
+            }
+
+            if (currentQuestionIndex < questions.length - 1) {
+                if(nextQuestionBtn) nextQuestionBtn.classList.remove('hidden');
+            } else {
+                showResults();
+            }
+        }
+
+        /**
+         * Manipula o clique no botão "Próxima Questão".
+         */
+        function handleNextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                displayQuestion(currentQuestionIndex);
+            }
+        }
+        
+        /**
+         * Exibe o resultado final do quiz.
+         */
+        function showResults() {
+            if (quizContainer) quizContainer.classList.add('hidden'); 
+            if (nextQuestionBtn) nextQuestionBtn.classList.add('hidden'); 
+            if (quizResultContainer) quizResultContainer.classList.remove('hidden');
+            
+            if (questions.length > 0) { 
+                 const calculatedPercentage = (score / questions.length) * 100;
+                 if (scoreElement) scoreElement.textContent = `Você acertou ${score} de ${questions.length} questões.`;
+                 if (percentageElement) percentageElement.textContent = `Seu aproveitamento: ${calculatedPercentage.toFixed(1)}%`;
+                 
+                 if (encouragementMessageElement) {
+                    if (calculatedPercentage >= 70) {
+                        encouragementMessageElement.textContent = "Parabéns! Você concluiu todas as sessões de U&E I com um ótimo desempenho!";
+                    } else if (calculatedPercentage >= 50) {
+                        encouragementMessageElement.textContent = "Bom trabalho ao finalizar as sessões de U&E I! Continue revisando os temas.";
+                    } else {
+                        encouragementMessageElement.textContent = "Você completou todas as sessões de U&E I! Reveja os pontos de maior dificuldade para consolidar o aprendizado.";
+                    }
+                    // Adiciona mensagem específica por ser a última sessão da última disciplina
+                    encouragementMessageElement.textContent += " Você concluiu todos os quizzes do 2º Bimestre. Parabéns pelo esforço e dedicação!";
+                 }
+
+            } else {
+                if (scoreElement) scoreElement.textContent = "Nenhuma questão foi carregada.";
+                if (percentageElement) percentageElement.textContent = "Aproveitamento: N/A";
+                if (encouragementMessageElement) encouragementMessageElement.textContent = "Não há questões nesta sessão.";
+            }
+            
+            // Como esta é a última sessão de U&E I, não há botão "Próxima Sessão".
+            // Os links para "Retornar à Seleção de Sessões (U&E I)" e "Retornar à Seleção de Disciplinas" já estão no HTML.
+
+            if (quizResultContainer) {
+                quizResultContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // Inicia o Quiz exibindo a primeira questão, se houver alguma.
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeQuizSession();
+        });
+        
+        function initializeQuizSession() {
+            quizContainer = document.getElementById('quiz-container');
+            nextQuestionBtn = document.getElementById('next-question-btn');
+            quizResultContainer = document.getElementById('quiz-result');
+            scoreElement = document.getElementById('score');
+            percentageElement = document.getElementById('percentage');
+            encouragementMessageElement = document.getElementById('encouragement-message');
+            // nextSessionLink não é necessário aqui pois é a última sessão da disciplina
+
+            currentQuestionIndex = 0;
+            score = 0;
+            answerConfirmed = false;
+
+            if (quizResultContainer) quizResultContainer.classList.add('hidden');
+            if (nextQuestionBtn) {
+                 nextQuestionBtn.classList.add('hidden');
+                 nextQuestionBtn.addEventListener('click', handleNextQuestion); // Adiciona listener aqui
+            }
+            if (quizContainer) quizContainer.classList.remove('hidden');
+
+            if (questions && questions.length > 0) {
+                displayQuestion(currentQuestionIndex);
+            } else {
+                if (quizContainer) {
+                    quizContainer.innerHTML = "<p class='text-center text-xl text-slate-700 mt-10'>Nenhuma questão disponível para esta sessão no momento.</p>";
+                }
+                showResults();
+            }
+        }
+    </script>
+
+</body>
+</html>

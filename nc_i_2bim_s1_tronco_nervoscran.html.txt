@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NC I Quiz – Tronco e Nervos Cranianos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .question-card {
+            scroll-margin-top: 80px; /* Offset for sticky header */
+        }
+        .feedback-correct {
+            background-color: #d1fae5; /* Tailwind green-100 */
+            border-left: 4px solid #10b981; /* Tailwind green-500 */
+            color: #065f46; /* Tailwind green-800 */
+        }
+        .feedback-incorrect {
+            background-color: #fee2e2; /* Tailwind red-100 */
+            border-left: 4px solid #ef4444; /* Tailwind red-500 */
+            color: #991b1b; /* Tailwind red-800 */
+        }
+        /* Custom radio button appearance */
+        .custom-radio:checked {
+            background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e");
+            background-color: #2563eb; /* Tailwind blue-600 */
+            border-color: #2563eb; /* Tailwind blue-600 */
+        }
+        .custom-radio {
+            appearance: none;
+            -webkit-appearance: none;
+            border-radius: 50%;
+            border-width: 2px;
+            border-style: solid;
+            border-color: #9ca3af; /* Tailwind gray-400 */
+            width: 1.25em;
+            height: 1.25em;
+            margin-right: 0.5em;
+            position: relative;
+            top: 0.2em;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-slate-100 text-slate-900 flex flex-col min-h-screen">
+
+    <header class="bg-white shadow-md py-5 sm:py-6 sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6">
+            <h1 class="text-2xl sm:text-3xl font-bold text-blue-600 text-center">Neurociências I – Quiz: Tronco Encefálico e Nervos Cranianos</h1>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 sm:px-6 py-8">
+        <div class="mb-6">
+            <a href="nc_i_2bim_sessoes.html" class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors duration-300 text-base sm:text-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 sm:w-6 sm:h-6 mr-2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+                Voltar para Sessões de NC I (2º Bim)
+            </a>
+        </div>
+
+        <div id="quiz-container">
+            </div>
+
+        <div id="navigation-buttons" class="mt-8 text-center">
+            <button id="next-question-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300 hidden">
+                Próxima Questão
+            </button>
+        </div>
+
+        <div id="quiz-result" class="hidden mt-10 bg-white p-6 sm:p-8 rounded-xl shadow-xl text-center">
+            <h2 class="text-2xl sm:text-3xl font-bold text-blue-600 mb-4">Resultado Final do Quiz</h2>
+            <p id="score" class="text-xl sm:text-2xl text-slate-700 mb-2"></p>
+            <p id="percentage" class="text-lg sm:text-xl text-slate-600 mb-4"></p>
+            <p id="encouragement-message" class="text-md text-slate-600 mb-6"></p>
+            <div class="mt-6 space-y-4 sm:space-y-0 sm:flex sm:flex-wrap sm:justify-center sm:gap-4">
+                <button onclick="window.location.reload()" class="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300">
+                    Tentar Novamente
+                </button>
+                <a href="nc_i_2bim_s2_diencefalo_sono.html" id="next-session-link" class="w-full sm:w-auto inline-block bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300">
+                    Próxima Sessão (Diencéfalo e Sono)
+                </a>
+                <a href="nc_i_2bim_sessoes.html" class="w-full sm:w-auto inline-block bg-slate-500 hover:bg-slate-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300">
+                    Retornar à Seleção de Sessões (NC I)
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-slate-200 border-t border-slate-300 py-5 sm:py-6 mt-auto">
+        <div class="container mx-auto px-4 sm:px-6 text-center">
+            <p class="text-sm text-slate-600">© <span id="currentYear"></span> – Quiz para Estudos Médicos. Foco: 2º Bimestre.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Define o ano atual no rodapé
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Array de questões para a Sessão 1 de Neurociências I
+        const questions = [
+            // Questão 1
+            {
+                caseClinical: "Um paciente de 65 anos apresenta-se com início súbito de vertigem intensa, náuseas, vômitos, disartria, disfagia, soluços incoercíveis e hipoestesia termoálgica na hemiface direita e no hemicorpo esquerdo. Ao exame neurológico, observa-se também síndrome de Horner à direita (ptose, miose, anidrose facial) e ataxia apendicular direita. Uma ressonância magnética de encéfalo evidencia uma lesão isquêmica na região lateral do bulbo.",
+                statement: "O quadro clínico descrito é altamente sugestivo da Síndrome de Wallenberg (ou síndrome bulbar lateral). Considerando a neuroanatomia do tronco encefálico, qual artéria é mais frequentemente ocluída causando esta síndrome e qual nervo craniano, cujos núcleos estão localizados no bulbo, está envolvido na manifestação da disfagia e disartria?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Artéria basilar; Nervo Trigêmeo (V par).", value: "a" },
+                    { text: "Artéria cerebelar superior; Nervo Facial (VII par).", value: "b" },
+                    { text: "Artéria vertebral ou artéria cerebelar posterior inferior (PICA); Nervo Vago (X par) e/ou Glossofaríngeo (IX par) através do núcleo ambíguo.", value: "c" },
+                    { text: "Artéria cerebral posterior; Nervo Hipoglosso (XII par).", value: "d" },
+                    { text: "Artéria cerebelar anterior inferior (AICA); Nervo Vestibulococlear (VIII par).", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "A Síndrome de Wallenberg é classicamente causada pela oclusão da artéria vertebral ou de seu ramo, a PICA, que irriga a porção dorsolateral do bulbo. A disfagia e a disartria são frequentemente devidas ao acometimento do núcleo ambíguo (fibras para nervos IX e X)."
+            },
+            // Questão 2
+            {
+                caseClinical: "Uma paciente de 45 anos queixa-se de dor facial lancinante, em \"choque\", de curta duração, desencadeada por estímulos táteis leves no lado direito da face, como mastigar, falar ou tocar a bochecha. Os episódios são recorrentes e intensos. A suspeita diagnóstica é de neuralgia do trigêmeo.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Forames+Nervo+Trigêmeo", 
+                    alt: "Forames de emergência dos ramos do nervo trigêmeo.", 
+                    caption: "Esquema ilustrativo dos forames do crânio por onde emergem os ramos do nervo trigêmeo (V1, V2, V3)." 
+                },
+                statement: "O nervo trigêmeo (V par craniano) é um nervo misto, sendo o principal responsável pela sensibilidade geral da face e pela inervação motora dos músculos da mastigação. Quais são os três ramos principais do nervo trigêmeo e por quais forames do crânio eles emergem, respectivamente?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Ramo oftálmico (V1) - Forame redondo; Ramo maxilar (V2) - Fissura orbital superior; Ramo mandibular (V3) - Forame oval.", value: "a" },
+                    { text: "Ramo oftálmico (V1) - Fissura orbital superior; Ramo maxilar (V2) - Forame redondo; Ramo mandibular (V3) - Forame oval.", value: "b" },
+                    { text: "Ramo oftálmico (V1) - Forame oval; Ramo maxilar (V2) - Forame redondo; Ramo mandibular (V3) - Fissura orbital superior.", value: "c" },
+                    { text: "Ramo facial (V1) - Canal óptico; Ramo glossofaríngeo (V2) - Forame jugular; Ramo vago (V3) - Forame estilomastoideo.", value: "d" },
+                    { text: "Ramo oftálmico (V1) - Fissura orbital inferior; Ramo maxilar (V2) - Forame espinhoso; Ramo mandibular (V3) - Canal carotídeo.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "O nervo trigêmeo (V) possui três divisões: V1 (oftálmico) emerge pela fissura orbital superior; V2 (maxilar) pelo forame redondo; e V3 (mandibular) pelo forame oval."
+            },
+            // Questão 3
+            {
+                caseClinical: "Um paciente sofreu um traumatismo cranioencefálico com fratura da base do crânio envolvendo a placa cribriforme do osso etmoide. Após o trauma, ele refere perda completa do olfato (anosmia).",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Placa+Cribriforme+e+Nervo+Olfatório", 
+                    alt: "Nervo olfatório e placa cribriforme.", 
+                    caption: "Ilustração da placa cribriforme do osso etmoide e os filamentos do nervo olfatório." 
+                },
+                statement: "A anosmia apresentada pelo paciente é consequência da lesão de qual nervo craniano, cujos filamentos atravessam a placa cribriforme do osso etmoide para fazer sinapse no bulbo olfatório?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Nervo Óptico (II par).", value: "a" },
+                    { text: "Nervo Olfatório (I par).", value: "b" },
+                    { text: "Nervo Trigêmeo (V par), ramo oftálmico.", value: "c" },
+                    { text: "Nervo Facial (VII par), através do nervo corda do tímpano.", value: "d" },
+                    { text: "Nervo Glossofaríngeo (IX par).", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "O nervo olfatório (I par) é composto por filamentos que atravessam a placa cribriforme do etmoide para alcançar o bulbo olfatório. Fraturas nessa região podem causar anosmia."
+            },
+            // Questão 4
+            {
+                caseClinical: "Uma paciente de 30 anos apresenta paralisia facial periférica súbita à direita (Paralisia de Bell), com incapacidade de fechar o olho direito, desvio da comissura labial para a esquerda ao sorrir, e dificuldade para franzir a testa à direita. Ela também refere hiperacusia (audição dolorosamente alta) no ouvido direito e perda do paladar nos dois terços anteriores da língua do mesmo lado.",
+                 image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Funções+Nervo+Facial", 
+                    alt: "Funções do Nervo Facial.", 
+                    caption: "Esquema ilustrando as diversas funções e ramos do nervo facial (VII par)." 
+                },
+                statement: "A paralisia de Bell envolve a disfunção do nervo facial (VII par). Além da inervação motora dos músculos da expressão facial, quais outras funções são mediadas por diferentes ramos ou componentes do nervo facial, explicando os sintomas associados da paciente (hiperacusia e ageusia parcial)?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Inervação sensitiva geral da face e propriocepção dos músculos mastigatórios.", value: "a" },
+                    { text: "Inervação motora do músculo elevador da pálpebra superior e dos músculos extrínsecos do olho.", value: "b" },
+                    { text: "Inervação parassimpática para a glândula parótida (salivação) e sensibilidade gustativa do terço posterior da língua.", value: "c" },
+                    { text: "Inervação motora para o músculo estapédio (que modula a vibração do estribo na orelha média) e fibras gustativas para os dois terços anteriores da língua (via nervo corda do tímpano), além de fibras parassimpáticas para glândulas lacrimais e salivares (submandibular e sublingual).", value: "d" },
+                    { text: "Controle da constrição pupilar e acomodação do cristalino.", value: "e" }
+                ],
+                correctAnswer: "d",
+                justification: "O nervo facial (VII) inerva o músculo estapédio (audição), carrega gustação dos 2/3 anteriores da língua (corda do tímpano) e fibras parassimpáticas para glândulas lacrimais e salivares (submandibular/sublingual)."
+            },
+            // Questão 5
+            {
+                caseClinical: "Durante um exame neurológico, solicita-se ao paciente que protrua a língua. Observa-se que a língua se desvia para o lado esquerdo ao ser protruída. Não há outras alterações motoras ou sensitivas evidentes na face ou membros.",
+                statement: "O desvio da língua para um dos lados ao ser protruída sugere lesão de qual nervo craniano, e qual o mecanismo desse desvio?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Nervo Glossofaríngeo (IX par) esquerdo; devido à paralisia dos músculos estilofaríngeo e constritores da faringe.", value: "a" },
+                    { text: "Nervo Vago (X par) direito; devido à paralisia do palato mole ipsilateral.", value: "b" },
+                    { text: "Nervo Hipoglosso (XII par) esquerdo; devido à fraqueza do músculo genioglosso esquerdo, fazendo com que a ação do genioglosso direito (mais forte) empurre a língua para o lado paralisado (esquerdo).", value: "c" },
+                    { text: "Nervo Trigêmeo (V par), ramo mandibular direito; devido à fraqueza dos músculos mastigatórios direitos.", value: "d" },
+                    { text: "Nervo Facial (VII par) esquerdo; devido à paralisia dos músculos bucinador e orbicular da boca à esquerda.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "O nervo hipoglosso (XII) inerva os músculos da língua. Em lesão unilateral, o músculo genioglosso do lado são empurra a língua para o lado paralisado. Desvio para esquerda = lesão do XII par esquerdo."
+            },
+            // Questão 6
+            {
+                caseClinical: "Um paciente com diabetes mellitus de longa data apresenta ptose palpebral à direita, diplopia (visão dupla) e o olho direito está desviado para baixo e para fora (inferolateralmente). A pupila direita está midriática (dilatada) e não reage à luz.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Paralisia+Nervo+Oculomotor", 
+                    alt: "Sinais de paralisia do nervo oculomotor.", 
+                    caption: "Ilustração dos achados clínicos na paralisia do III nervo craniano (oculomotor)." 
+                },
+                statement: "Este conjunto de achados (ptose, oftalmoplegia com desvio inferolateral do olho, midríase) é característico da paralisia de qual nervo craniano?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Nervo Óptico (II par).", value: "a" },
+                    { text: "Nervo Oculomotor (III par).", value: "b" },
+                    { text: "Nervo Troclear (IV par).", value: "c" },
+                    { text: "Nervo Abducente (VI par).", value: "d" },
+                    { text: "Nervo Trigêmeo (V par), ramo oftálmico.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "A paralisia do nervo oculomotor (III par) causa ptose (m. elevador da pálpebra), desvio inferolateral do olho (ação sem oposição do IV e VI pares) e midríase (lesão das fibras parassimpáticas)."
+            },
+            // Questão 7
+            {
+                caseClinical: "Um paciente sofre um acidente vascular encefálico (AVE) isquêmico afetando a ponte ventral, na sua porção basilar. Ele evolui com um quadro de tetraplegia e anartria (incapacidade de falar), mas com preservação da consciência, da movimentação ocular vertical e do piscar.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Ponte+Base+e+Tegmento", 
+                    alt: "Estruturas da ponte.", 
+                    caption: "Esquema da ponte, diferenciando a base (ventral) e o tegmento (dorsal) e suas principais estruturas." 
+                },
+                statement: "A ponte, uma das três divisões do tronco encefálico, contém importantes tratos descendentes motores e núcleos de nervos cranianos. Analise as seguintes asserções sobre a estrutura e função da ponte:\nI. A base da ponte (parte ventral) contém predominantemente fibras corticoespinais e corticonucleares (ou corticobulbares) descendentes, além de núcleos pontinos que recebem aferências do córtex cerebral e projetam para o cerebelo contralateral através dos pedúnculos cerebelares médios.\nPORQUE\nII. O tegmento da ponte (parte dorsal) contém os núcleos dos nervos cranianos V (trigêmeo, porções sensitiva principal e motora), VI (abducente), VII (facial) e VIII (vestibulococlear, porções vestibulares e cocleares), além de tratos ascendentes sensitivos e a formação reticular.",
+                type: "assertion-reason",
+                options: [
+                    { text: "As asserções I e II são proposições verdadeiras, e a II é uma justificativa correta da I.", value: "a" },
+                    { text: "As asserções I e II são proposições verdadeiras, mas a II não é uma justificativa correta da I.", value: "b" },
+                    { text: "A asserção I é uma proposição verdadeira, e a II é uma proposição falsa.", value: "c" },
+                    { text: "A asserção I é uma proposição falsa, e a II é uma proposição verdadeira.", value: "d" },
+                    { text: "As asserções I e II são proposições falsas.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "Ambas as asserções são verdadeiras, descrevendo corretamente a base (I) e o tegmento (II) da ponte. No entanto, a descrição do tegmento (II) não é uma justificativa direta para a composição da base (I); são regiões distintas."
+            },
+            // Questão 8
+            {
+                caseClinical: "Durante um exame de fundo de olho em um paciente com hipertensão intracraniana, o oftalmologista observa papiledema bilateral, que é o edema do disco óptico.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Nervo+Óptico+e+Meninges", 
+                    alt: "Nervo óptico e suas bainhas meníngeas.", 
+                    caption: "Ilustração do nervo óptico como extensão do SNC, envolvido por meninges." 
+                },
+                statement: "O nervo óptico (II par craniano) é responsável pela transmissão dos impulsos visuais da retina para o cérebro. Qual das seguintes afirmações descreve CORRETAMENTE uma característica anatômica ou funcional do nervo óptico que o diferencia da maioria dos outros nervos cranianos e explica sua suscetibilidade ao papiledema na hipertensão intracraniana?",
+                type: "multiple-choice",
+                options: [
+                    { text: "O nervo óptico é um nervo puramente motor, controlando os músculos extrínsecos do olho.", value: "a" },
+                    { text: "Diferentemente dos outros nervos cranianos, o nervo óptico é, na verdade, um trato do sistema nervoso central, sendo uma extensão do diencéfalo, e é envolvido pelas mesmas meninges (dura-máter, aracnoide e pia-máter) que o encéfalo, com espaço subaracnóideo contínuo.", value: "b" },
+                    { text: "O nervo óptico não possui bainha de mielina, o que o torna mais vulnerável a compressões.", value: "c" },
+                    { text: "Sua origem aparente no tronco encefálico é na fossa interpeduncular do mesencéfalo.", value: "d" },
+                    { text: "Ele emerge do crânio através do forame redondo, juntamente com o ramo maxilar do trigêmeo.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "O nervo óptico é um trato do SNC, uma extensão do diencéfalo, envolvido por meninges. O aumento da pressão intracraniana se transmite pelo espaço subaracnóideo ao redor do nervo, causando papiledema."
+            },
+            // Questão 9
+            {
+                caseClinical: "Um paciente sofre uma lesão na região posterior do pescoço e refere dificuldade em elevar os ombros (encolher os ombros) contra resistência e em virar a cabeça para o lado oposto contra resistência.",
+                statement: "Qual nervo craniano é primariamente responsável pela inervação motora dos músculos trapézio e esternocleidomastoideo, explicando os déficits apresentados pelo paciente?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Nervo Vago (X par).", value: "a" },
+                    { text: "Nervo Hipoglosso (XII par).", value: "b" },
+                    { text: "Nervo Acessório (XI par).", value: "c" },
+                    { text: "Nervo Glossofaríngeo (IX par).", value: "d" },
+                    { text: "Nervo Facial (VII par), ramo cervical.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "O nervo acessório (XI par), especificamente sua raiz espinhal, inerva os músculos esternocleidomastoideo (rotação da cabeça) e trapézio (elevação dos ombros)."
+            },
+            // Questão 10
+            {
+                caseClinical: "Um paciente refere dificuldade em olhar para o lado direito apenas com o olho direito, ou seja, abduzir o olho direito. A movimentação dos demais músculos extrínsecos de ambos os olhos está preservada, assim como a convergência.",
+                 image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Músculo+Reto+Lateral", 
+                    alt: "Ação do músculo reto lateral.", 
+                    caption: "Ilustração da ação do músculo reto lateral e sua inervação pelo nervo abducente." 
+                },
+                statement: "A incapacidade de abduzir o olho (movê-lo lateralmente) é um sinal clássico de paralisia de qual nervo craniano, responsável pela inervação do músculo reto lateral?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Nervo Oculomotor (III par).", value: "a" },
+                    { text: "Nervo Troclear (IV par).", value: "b" },
+                    { text: "Nervo Abducente (VI par).", value: "c" },
+                    { text: "Nervo Óptico (II par).", value: "d" },
+                    { text: "Nervo Trigêmeo (V par), ramo oftálmico.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "O nervo abducente (VI par) inerva o músculo reto lateral, responsável pela abdução do olho. Sua paralisia causa incapacidade de mover o olho lateralmente."
+            }
+        ];
+
+        // Variáveis globais do quiz
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answerConfirmed = false; 
+
+        // Elementos do DOM (serão obtidos na inicialização)
+        let quizContainer;
+        let nextQuestionBtn;
+        let quizResultContainer;
+        let scoreElement;
+        let percentageElement;
+        let encouragementMessageElement;
+        let nextSessionLink; 
+
+        /**
+         * Exibe a questão atual na tela.
+         * @param {number} index - O índice da questão a ser exibida.
+         */
+        function displayQuestion(index) {
+            answerConfirmed = false; 
+            const q = questions[index];
+            let optionsHtml = '';
+
+            if (!q) { 
+                console.error("Questão não encontrada no índice:", index);
+                if (questions.length > 0) { 
+                     showResults();
+                } else { 
+                    if(quizContainer) quizContainer.innerHTML = "<p class='text-center text-red-500'>Nenhuma questão carregada para este quiz.</p>";
+                }
+                return;
+            }
+
+            if (q.type === "multiple-choice" || q.type === "assertion-reason") {
+                q.options.forEach(option => {
+                    optionsHtml += `
+                        <label class="block bg-slate-50 hover:bg-sky-100 p-4 rounded-lg border border-slate-200 mb-3 cursor-pointer transition-colors duration-200">
+                            <input type="radio" name="question${index}" value="${option.value}" class="custom-radio">
+                            <span class="text-slate-700">${option.text}</span>
+                        </label>
+                    `;
+                });
+            }
+            // Adicionar lógica para outros tipos de questão se necessário
+            
+            if(quizContainer) { 
+                quizContainer.innerHTML = `
+                    <div class="question-card bg-white p-6 sm:p-8 rounded-xl shadow-xl" id="q_card_${index}">
+                        <p class="text-sm text-slate-500 mb-1">Questão ${index + 1} de ${questions.length}</p>
+                        ${q.caseClinical ? `<div class="mb-4 p-4 bg-sky-50 rounded-md text-slate-700 text-sm sm:text-base italic">${q.caseClinical}</div>` : ''}
+                        ${q.image ? `
+                            <div class="my-4 text-center">
+                                <img src="${q.image.src}" alt="${q.image.alt}" class="max-w-full h-auto mx-auto rounded-lg shadow-sm border border-slate-200" onerror="this.onerror=null; this.src='https://placehold.co/600x300/e2e8f0/64748b?text=Imagem+Indisponível'; this.alt='Imagem indisponível';">
+                                ${q.image.caption ? `<p class="text-xs text-slate-500 mt-2">${q.image.caption}</p>` : ''}
+                            </div>` : ''}
+                        <p class="font-semibold text-slate-800 mb-5 text-base sm:text-lg whitespace-pre-line">${q.statement}</p>
+                        <div class="options-container">${optionsHtml}</div>
+                        <button onclick="confirmAnswer(${index})" class="confirm-btn mt-6 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md transition-colors duration-300">
+                            Confirmar Resposta
+                        </button>
+                        <div class="feedback-area mt-4 p-4 rounded-md hidden text-sm sm:text-base"></div>
+                    </div>
+                `;
+            }
+            if(nextQuestionBtn) nextQuestionBtn.classList.add('hidden'); 
+            
+            const cardElement = document.getElementById(`q_card_${index}`);
+            if (cardElement) {
+                 cardElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        /**
+         * Confirma a resposta do usuário, calcula a pontuação e exibe o feedback.
+         * @param {number} index - O índice da questão atual.
+         */
+        function confirmAnswer(index) {
+            if (answerConfirmed) return; 
+
+            const q = questions[index];
+            if (!q) { 
+                console.error("Tentativa de confirmar resposta para questão inexistente:", index);
+                return;
+            }
+            const feedbackDiv = quizContainer ? quizContainer.querySelector(`#q_card_${index} .feedback-area`) : null;
+            const confirmBtn = quizContainer ? quizContainer.querySelector(`#q_card_${index} .confirm-btn`) : null;
+            let isCorrect = false;
+            
+            if (q.type === "multiple-choice" || q.type === "assertion-reason") {
+                const selectedOption = quizContainer ? quizContainer.querySelector(`input[name="question${index}"]:checked`) : null;
+                if (!selectedOption) { 
+                    if (feedbackDiv) {
+                        feedbackDiv.innerHTML = '<p class="font-semibold">Por favor, selecione uma alternativa.</p>';
+                        feedbackDiv.className = 'feedback-area mt-4 p-4 rounded-md bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700';
+                        feedbackDiv.classList.remove('hidden');
+                    }
+                    return;
+                }
+                isCorrect = selectedOption.value === q.correctAnswer;
+            }
+            // Adicionar lógica para outros tipos de questão se necessário
+            
+            if (feedbackDiv) { 
+                if (isCorrect) {
+                    score++;
+                    feedbackDiv.innerHTML = `<p class="font-semibold mb-1">Resposta Correta!</p><p>${q.justification}</p>`;
+                    feedbackDiv.className = 'feedback-area mt-4 p-4 rounded-md feedback-correct';
+                } else {
+                    feedbackDiv.innerHTML = `<p class="font-semibold mb-1">Resposta Incorreta.</p><p><strong>Justificativa:</strong> ${q.justification}</p>`;
+                    feedbackDiv.className = 'feedback-area mt-4 p-4 rounded-md feedback-incorrect';
+                }
+                feedbackDiv.classList.remove('hidden');
+            }
+
+            if (confirmBtn) { 
+                confirmBtn.disabled = true; 
+                confirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+            answerConfirmed = true; 
+
+            if (quizContainer) {
+                const inputs = quizContainer.querySelectorAll(`#q_card_${index} input[type="radio"]`);
+                inputs.forEach(input => input.disabled = true);
+            }
+
+            if (currentQuestionIndex < questions.length - 1) {
+                if(nextQuestionBtn) nextQuestionBtn.classList.remove('hidden');
+            } else {
+                showResults();
+            }
+        }
+
+        /**
+         * Manipula o clique no botão "Próxima Questão".
+         */
+        function handleNextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                displayQuestion(currentQuestionIndex);
+            }
+        }
+        
+        /**
+         * Exibe o resultado final do quiz.
+         */
+        function showResults() {
+            if (quizContainer) quizContainer.classList.add('hidden'); 
+            if (nextQuestionBtn) nextQuestionBtn.classList.add('hidden'); 
+            if (quizResultContainer) quizResultContainer.classList.remove('hidden');
+            
+            if (questions.length > 0) { 
+                 const calculatedPercentage = (score / questions.length) * 100;
+                 if (scoreElement) scoreElement.textContent = `Você acertou ${score} de ${questions.length} questões.`;
+                 if (percentageElement) percentageElement.textContent = `Seu aproveitamento: ${calculatedPercentage.toFixed(1)}%`;
+                 
+                 if (encouragementMessageElement) {
+                    if (calculatedPercentage >= 70) {
+                        encouragementMessageElement.textContent = "Excelente trabalho! Continue assim para a próxima sessão.";
+                    } else if (calculatedPercentage >= 50) {
+                        encouragementMessageElement.textContent = "Bom esforço! Reveja os pontos que errou e siga em frente.";
+                    } else {
+                        encouragementMessageElement.textContent = "Não desanime! A revisão é chave para o aprendizado. Tente novamente!";
+                    }
+                 }
+
+            } else {
+                if (scoreElement) scoreElement.textContent = "Nenhuma questão foi carregada.";
+                if (percentageElement) percentageElement.textContent = "Aproveitamento: N/A";
+                if (encouragementMessageElement) encouragementMessageElement.textContent = "Não há questões nesta sessão.";
+            }
+            
+            // Configura o link da próxima sessão
+            if (nextSessionLink) {
+                // Link para NC I - Sessão 2 (Diencéfalo e Sono)
+                nextSessionLink.href = "nc_i_2bim_s2_diencefalo_sono.html";
+                nextSessionLink.textContent = "Próxima Sessão (Diencéfalo e Sono)";
+            }
+
+
+            if (quizResultContainer) {
+                quizResultContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // Inicia o Quiz exibindo a primeira questão, se houver alguma.
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeQuizSession();
+        });
+        
+        function initializeQuizSession() {
+            quizContainer = document.getElementById('quiz-container');
+            nextQuestionBtn = document.getElementById('next-question-btn');
+            quizResultContainer = document.getElementById('quiz-result');
+            scoreElement = document.getElementById('score');
+            percentageElement = document.getElementById('percentage');
+            encouragementMessageElement = document.getElementById('encouragement-message');
+            nextSessionLink = document.getElementById('next-session-link'); 
+
+            currentQuestionIndex = 0;
+            score = 0;
+            answerConfirmed = false;
+
+            if (quizResultContainer) quizResultContainer.classList.add('hidden');
+            if (nextQuestionBtn) {
+                 nextQuestionBtn.classList.add('hidden');
+                 nextQuestionBtn.addEventListener('click', handleNextQuestion); // Adiciona listener aqui
+            }
+            if (quizContainer) quizContainer.classList.remove('hidden');
+
+            if (questions && questions.length > 0) {
+                displayQuestion(currentQuestionIndex);
+            } else {
+                if (quizContainer) {
+                    quizContainer.innerHTML = "<p class='text-center text-xl text-slate-700 mt-10'>Nenhuma questão disponível para esta sessão no momento.</p>";
+                }
+                showResults();
+            }
+        }
+    </script>
+
+</body>
+</html>

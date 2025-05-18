@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOI I Quiz – Respi: Trocas e Controle</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .question-card {
+            scroll-margin-top: 80px; /* Offset for sticky header */
+        }
+        .feedback-correct {
+            background-color: #d1fae5; /* Tailwind green-100 */
+            border-left: 4px solid #10b981; /* Tailwind green-500 */
+            color: #065f46; /* Tailwind green-800 */
+        }
+        .feedback-incorrect {
+            background-color: #fee2e2; /* Tailwind red-100 */
+            border-left: 4px solid #ef4444; /* Tailwind red-500 */
+            color: #991b1b; /* Tailwind red-800 */
+        }
+        /* Custom radio button appearance */
+        .custom-radio:checked {
+            background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e");
+            background-color: #2563eb; /* Tailwind blue-600 */
+            border-color: #2563eb; /* Tailwind blue-600 */
+        }
+        .custom-radio {
+            appearance: none;
+            -webkit-appearance: none;
+            border-radius: 50%;
+            border-width: 2px;
+            border-style: solid;
+            border-color: #9ca3af; /* Tailwind gray-400 */
+            width: 1.25em;
+            height: 1.25em;
+            margin-right: 0.5em;
+            position: relative;
+            top: 0.2em;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-slate-100 text-slate-900 flex flex-col min-h-screen">
+
+    <header class="bg-white shadow-md py-5 sm:py-6 sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6">
+            <h1 class="text-2xl sm:text-3xl font-bold text-blue-600 text-center">SOI I – Quiz: Sistema Respiratório – Trocas Gasosas, Transporte e Controle</h1>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 sm:px-6 py-8">
+        <div class="mb-6">
+            <a href="soi_i_2bim_sessoes.html" class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors duration-300 text-base sm:text-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 sm:w-6 sm:h-6 mr-2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+                Voltar para Sessões de SOI I (2º Bim)
+            </a>
+        </div>
+
+        <div id="quiz-container">
+            </div>
+
+        <div id="navigation-buttons" class="mt-8 text-center">
+            <button id="next-question-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300 hidden">
+                Próxima Questão
+            </button>
+        </div>
+
+        <div id="quiz-result" class="hidden mt-10 bg-white p-6 sm:p-8 rounded-xl shadow-xl text-center">
+            <h2 class="text-2xl sm:text-3xl font-bold text-blue-600 mb-4">Resultado Final do Quiz</h2>
+            <p id="score" class="text-xl sm:text-2xl text-slate-700 mb-2"></p>
+            <p id="percentage" class="text-lg sm:text-xl text-slate-600 mb-4"></p>
+            <p id="encouragement-message" class="text-md text-slate-600 mb-6"></p>
+            <div class="mt-6 space-y-4 sm:space-y-0 sm:flex sm:flex-wrap sm:justify-center sm:gap-4">
+                <button onclick="window.location.reload()" class="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300">
+                    Tentar Novamente
+                </button>
+                <a href="soi_i_2bim_sessoes.html" class="w-full sm:w-auto inline-block bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300">
+                    Retornar à Seleção de Sessões (SOI I)
+                </a>
+                <a href="quiz_2bim_index.html" class="w-full sm:w-auto inline-block bg-slate-500 hover:bg-slate-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300">
+                    Retornar à Seleção de Disciplinas
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-slate-200 border-t border-slate-300 py-5 sm:py-6 mt-auto">
+        <div class="container mx-auto px-4 sm:px-6 text-center">
+            <p class="text-sm text-slate-600">© <span id="currentYear"></span> – Quiz para Estudos Médicos. Foco: 2º Bimestre.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Define o ano atual no rodapé
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Array de questões para a Sessão 4 de SOI I
+        const questions = [
+            // Questão 1
+            {
+                caseClinical: "Um paciente com pneumonia extensa apresenta hipoxemia grave (baixa pressão parcial de oxigênio no sangue arterial, PaO2). A radiografia de tórax mostra consolidação em múltiplos lobos pulmonares, e a gasometria arterial revela PaO2 de 55 mmHg em ar ambiente.",
+                image: { 
+                    src: "https://histologia.icb.ufg.br/images/laminas/12_respiratorio/l2-7.jpg", 
+                    alt: "Micrografia de tecido pulmonar mostrando alvéolos.", 
+                    caption: "Micrografia de tecido pulmonar mostrando alvéolos (H). Considere a estrutura da parede alveolar em relação à difusão de gases. Idealmente, um esquema da barreira alvéolo-capilar seria mais focado." 
+                },
+                statement: "A hipoxemia no paciente com pneumonia ocorre primariamente devido a um distúrbio na difusão de oxigênio através da membrana alvéolo-capilar. Qual dos seguintes fatores, alterado pela pneumonia, é o MAIS diretamente responsável por essa dificuldade de difusão, de acordo com a Lei de Fick para a difusão de gases (Vgas = A/T × D × (P1−P2))?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Aumento da área de superfície (A) da membrana alvéolo-capilar devido à resposta inflamatória.", value: "a" },
+                    { text: "Diminuição da espessura (T) da membrana alvéolo-capilar devido à destruição tecidual.", value: "b" },
+                    { text: "Aumento da espessura (T) da membrana alvéolo-capilar devido ao edema inflamatório, exsudato e consolidação alveolar, e/ou redução da área de superfície (A) efetiva para trocas.", value: "c" },
+                    { text: "Aumento do coeficiente de difusão (D) do oxigênio no fluido inflamatório.", value: "d" },
+                    { text: "Aumento do gradiente de pressão parcial do oxigênio (P1−P2) entre o alvéolo e o capilar.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "Na pneumonia, o processo inflamatório causa acúmulo de fluido e células nos alvéolos (aumentando a espessura T da membrana alvéolo-capilar) e preenchimento alveolar (reduzindo a área A efetiva para trocas). Ambos os fatores diminuem a difusão de O2, conforme a Lei de Fick."
+            },
+            // Questão 2
+            {
+                caseClinical: "Um indivíduo saudável está em uma altitude de 4.000 metros, onde a pressão barométrica é significativamente menor que ao nível do mar. Ele começa a sentir dispneia e fadiga. Uma oximetria de pulso revela saturação de oxigênio de 85%.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Curva+Oxi-hemoglobina", 
+                    alt: "Curva de dissociação da oxi-hemoglobina.", 
+                    caption: "Esquema da curva de dissociação da oxi-hemoglobina, ilustrando PO2, Saturação de O2, P50 e desvios." 
+                },
+                statement: "A afinidade da hemoglobina pelo oxigênio é um fator crucial para o transporte de O2 no sangue e é representada pela curva de dissociação da oxi-hemoglobina. Em grandes altitudes, a pressão parcial de oxigênio no ar inspirado (PIO2) e, consequentemente, no sangue arterial (PaO2) está reduzida. Qual das seguintes adaptações fisiológicas ou fatores alteraria a curva de dissociação da oxi-hemoglobina para a DIREITA, facilitando a liberação de oxigênio nos tecidos em resposta à hipóxia tecidual?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Diminuição da temperatura corporal.", value: "a" },
+                    { text: "Aumento do pH sanguíneo (alcalose).", value: "b" },
+                    { text: "Diminuição dos níveis de 2,3-difosfoglicerato (2,3-DPG) nos eritrócitos.", value: "c" },
+                    { text: "Aumento da PCO2 sanguínea (hipercapnia) e/ou diminuição do pH (acidose).", value: "d" },
+                    { text: "Aumento da concentração de monóxido de carbono (CO) no sangue.", value: "e" }
+                ],
+                correctAnswer: "d",
+                justification: "Um desvio da curva de dissociação da oxi-hemoglobina para a direita (menor afinidade, maior P50) facilita a liberação de O2 nos tecidos. Isso ocorre com aumento da PCO2, diminuição do pH (acidose - Efeito Bohr), aumento da temperatura e aumento do 2,3-DPG. O CO desvia a curva para a esquerda e para baixo."
+            },
+            // Questão 3
+            {
+                caseClinical: "Um paciente com doença pulmonar crônica desenvolve acidose respiratória devido à hipoventilação alveolar, resultando em um pH arterial de 7,28 e uma PaCO2 de 60 mmHg. Os rins tentam compensar essa alteração do equilíbrio ácido-base.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Sistema+Tampão+Bicarbonato", 
+                    alt: "Sistema tampão bicarbonato/ácido carbônico.", 
+                    caption: "Diagrama ilustrando o sistema bicarbonato/ácido carbônico (CO2 + H2O <=> H2CO3 <=> H+ + HCO3-)." 
+                },
+                statement: "A maior parte do dióxido de carbono (CO2) produzido pelo metabolismo tecidual é transportada no sangue dos tecidos para os pulmões na forma de íons bicarbonato (HCO3-). Qual enzima, presente em abundância nos eritrócitos, é crucial para catalisar a rápida conversão de CO2 e água em ácido carbônico (H2CO3), que subsequentemente se dissocia em H+ e HCO3-?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Anidrase carbônica.", value: "a" },
+                    { text: "Carboxi-hemoglobina sintetase.", value: "b" },
+                    { text: "Desidrogenase láctica.", value: "c" },
+                    { text: "ATPase de H+/K+.", value: "d" },
+                    { text: "Quinase do ácido carbônico.", value: "e" }
+                ],
+                correctAnswer: "a",
+                justification: "A anidrase carbônica é a enzima que catalisa de forma extremamente rápida a reação reversível: CO2 + H2O <=> H2CO3 <=> H+ + HCO3-. Essa reação é fundamental para o transporte da maior parte do CO2 no sangue (como bicarbonato) e também para a regulação do pH."
+            },
+            // Questão 4
+            {
+                caseClinical: "Um alpinista em aclimatação progressiva a grandes altitudes experimenta um aumento sustentado na ventilação (hiperventilação). Essa resposta é mediada, em parte, pela estimulação dos quimiorreceptores periféricos.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Quimiorreceptores+Periféricos", 
+                    alt: "Localização dos quimiorreceptores periféricos.", 
+                    caption: "Esquema da localização dos quimiorreceptores periféricos (corpos carotídeos e aórticos)." 
+                },
+                statement: "Os quimiorreceptores periféricos, localizados nos corpos carotídeos e aórticos, são sensíveis a alterações nos gases sanguíneos e no pH. Qual é o estímulo MAIS potente para o aumento da frequência de disparo desses quimiorreceptores, levando ao aumento da ventilação?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Aumento da pressão parcial de oxigênio no sangue arterial (PaO2).", value: "a" },
+                    { text: "Diminuição da pressão parcial de dióxido de carbono no sangue arterial (PaCO2).", value: "b" },
+                    { text: "Aumento do pH do sangue arterial (alcalose).", value: "c" },
+                    { text: "Diminuição da pressão parcial de oxigênio no sangue arterial (hipoxemia arterial).", value: "d" },
+                    { text: "Diminuição da concentração de íons bicarbonato (HCO3-) no plasma.", value: "e" }
+                ],
+                correctAnswer: "d",
+                justification: "Embora os quimiorreceptores periféricos também respondam ao aumento da PaCO2 e à diminuição do pH, o estímulo mais potente e primário para eles é a queda da PaO2 (hipoxemia arterial), especialmente quando a PaO2 cai abaixo de aproximadamente 60 mmHg."
+            },
+            // Questão 5
+            {
+                caseClinical: "Um paciente com ansiedade severa apresenta um episódio de hiperventilação aguda, respirando rapidamente e profundamente por vários minutos. Após o episódio, ele se queixa de tontura e parestesias (formigamento) nas extremidades. Uma gasometria arterial colhida durante a crise provavelmente mostraria alterações específicas.",
+                statement: "A hiperventilação alveolar, como no caso do paciente com crise de ansiedade, leva a uma \"lavagem\" excessiva de CO2 dos alvéolos e, consequentemente, do sangue. Qual é a principal alteração no equilíbrio ácido-base que resulta dessa hiperventilação e como ela se manifesta na gasometria arterial?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Acidose metabólica, com diminuição do pH e diminuição do bicarbonato (HCO3-).", value: "a" },
+                    { text: "Alcalose metabólica, com aumento do pH e aumento do bicarbonato (HCO3-).", value: "b" },
+                    { text: "Acidose respiratória, com diminuição do pH e aumento da PaCO2.", value: "c" },
+                    { text: "Alcalose respiratória, com aumento do pH e diminuição da PaCO2.", value: "d" },
+                    { text: "Distúrbio misto, com pH normal, PaCO2 baixa e bicarbonato baixo.", value: "e" }
+                ],
+                correctAnswer: "d",
+                justification: "A hiperventilação leva a uma eliminação excessiva de CO2, resultando em hipocapnia (diminuição da PaCO2). Como o CO2 dissolvido no sangue forma ácido carbônico, sua redução leva a uma diminuição da concentração de H+ e, consequentemente, a um aumento do pH sanguíneo. Isso caracteriza uma alcalose respiratória."
+            },
+            // Questão 6
+            {
+                caseClinical: "Durante o sono profundo em um indivíduo saudável, o controle da ventilação sofre algumas modificações em relação ao estado de vigília. A sensibilidade dos centros respiratórios a certos estímulos pode ser alterada.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Centros+Respiratórios", 
+                    alt: "Centros respiratórios no tronco encefálico.", 
+                    caption: "Esquema simplificado dos centros respiratórios no bulbo e ponte." 
+                },
+                statement: "O ritmo respiratório básico é gerado por neurônios localizados no tronco encefálico, principalmente no bulbo. Qual grupo de neurônios no bulbo é considerado o principal gerador do ritmo inspiratório basal (o \"marcapasso\" respiratório)?",
+                type: "multiple-choice",
+                options: [
+                    { text: "O grupo respiratório pontino (anteriormente conhecido como centro pneumotáxico).", value: "a" },
+                    { text: "O grupo respiratório ventral (GRV), especificamente o complexo pré-Bötzinger.", value: "b" },
+                    { text: "Os quimiorreceptores centrais localizados na superfície ventral do bulbo.", value: "c" },
+                    { text: "O centro apnêustico localizado na ponte inferior.", value: "d" },
+                    { text: "O grupo respiratório dorsal (GRD).", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "O complexo pré-Bötzinger, localizado dentro do Grupo Respiratório Ventral (GRV) no bulbo, é atualmente considerado a principal região geradora do ritmo respiratório basal em mamíferos."
+            },
+            // Questão 7
+            {
+                caseClinical: "Um paciente com DPOC retentor crônico de CO2 (PaCO2 basal de 55 mmHg) é internado com exacerbação infecciosa e recebe oxigenoterapia em alto fluxo inadvertidamente. Após algum tempo, observa-se uma diminuição da frequência respiratória e do nível de consciência do paciente.",
+                statement: "Em pacientes com hipercapnia crônica (retenção crônica de CO2), como no caso descrito, o estímulo ventilatório principal pode se tornar dependente da hipoxemia, pois os quimiorreceptores centrais podem ter se adaptado (dessensibilizado) aos níveis cronicamente elevados de PaCO2. Qual é o risco de administrar oxigênio em altas concentrações a esses pacientes?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Aumento paradoxal da PaCO2 devido à toxicidade direta do oxigênio sobre os quimiorreceptores centrais.", value: "a" },
+                    { text: "Supressão do estímulo hipóxico nos quimiorreceptores periféricos, que estavam mantendo uma parte significativa do drive ventilatório, podendo levar à hipoventilação, narcose por CO2 e piora da acidose respiratória.", value: "b" },
+                    { text: "Alcalose respiratória severa devido à melhora abrupta da oxigenação, causando vasoconstrição cerebral.", value: "c" },
+                    { text: "Desenvolvimento de edema pulmonar não cardiogênico devido à sobrecarga de oxigênio nos alvéolos.", value: "d" },
+                    { text: "Estimulação excessiva dos centros respiratórios bulbares, levando à fadiga muscular respiratória.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "Em pacientes retentores crônicos de CO2, o drive ventilatório pode depender da hipoxemia. A administração de O2 em alta concentração pode suprimir esse estímulo hipóxico (via quimiorreceptores periféricos), levando à hipoventilação, aumento da PaCO2 (narcose por CO2) e piora da acidose respiratória."
+            },
+            // Questão 8
+            {
+                caseClinical: "Um paciente em tratamento quimioterápico desenvolve anemia significativa, com níveis de hemoglobina de 7 g/dL (normal: 12-16 g/dL para mulheres, 14-18 g/dL para homens). Apesar da PaO2 e da saturação de oxigênio da hemoglobina estarem normais em ar ambiente, ele se queixa de fadiga e dispneia aos esforços.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Conteúdo+Arterial+de+O2", 
+                    alt: "Curva de oxi-hemoglobina e conteúdo de O2.", 
+                    caption: "A curva de dissociação da oxi-hemoglobina ajuda a entender a saturação, mas o conteúdo de O2 depende também da [Hb]." 
+                },
+                statement: "Mesmo com uma PaO2 e uma saturação de oxigênio arterial (SaO2) normais, a anemia severa, como no caso do paciente, compromete o transporte de oxigênio aos tecidos. Qual parâmetro do transporte de oxigênio é primariamente reduzido pela anemia, explicando a sintomatologia do paciente?",
+                type: "multiple-choice",
+                options: [
+                    { text: "A pressão parcial de oxigênio dissolvido no plasma.", value: "a" },
+                    { text: "A afinidade da hemoglobina pelo oxigênio (P50).", value: "b" },
+                    { text: "O conteúdo arterial de oxigênio (CaO2), que depende da concentração de hemoglobina funcional e da sua saturação.", value: "c" },
+                    { text: "A capacidade de difusão do oxigênio na membrana alvéolo-capilar.", value: "d" },
+                    { text: "A taxa de dissociação do oxigênio da hemoglobina nos tecidos.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "O conteúdo arterial de oxigênio (CaO2) é calculado por: CaO2 = (Hb × 1,34 × SaO2) + (PaO2 × 0,003). A anemia reduz a concentração de hemoglobina (Hb). Mesmo com SaO2 e PaO2 normais, a baixa Hb diminui drasticamente o CaO2, reduzindo a oferta de O2 aos tecidos."
+            },
+            // Questão 9
+            {
+                caseClinical: "Um paciente com cetoacidose diabética apresenta respiração rápida e profunda (Respiração de Kussmaul). A gasometria arterial revela pH 7,15, PaCO2 25 mmHg, HCO3- 10 mEq/L.",
+                statement: "A Respiração de Kussmaul observada no paciente com cetoacidose diabética é uma resposta compensatória do sistema respiratório a uma desordem ácido-básica primária. Analise as seguintes asserções:\nI. A cetoacidose diabética é uma forma de acidose metabólica, caracterizada pelo acúmulo de cetoácidos (ácidos fixos) e consequente consumo de bicarbonato (HCO3-), levando à queda do pH sanguíneo.\nPORQUE\nII. A hiperventilação (Respiração de Kussmaul) é estimulada pela acidemia e visa aumentar a eliminação de dióxido de carbono (CO2) pelos pulmões, reduzindo a PaCO2 e, assim, tentando elevar o pH sanguíneo como mecanismo compensatório respiratório para a acidose metabólica.",
+                type: "assertion-reason",
+                options: [
+                    { text: "As asserções I e II são proposições verdadeiras, e a II é uma justificativa correta da I.", value: "a" },
+                    { text: "As asserções I e II são proposições verdadeiras, mas a II não é uma justificativa correta da I.", value: "b" },
+                    { text: "A asserção I é uma proposição verdadeira, e a II é uma proposição falsa.", value: "c" },
+                    { text: "A asserção I é uma proposição falsa, e a II é uma proposição verdadeira.", value: "d" },
+                    { text: "As asserções I e II são proposições falsas.", value: "e" }
+                ],
+                correctAnswer: "a",
+                justification: "A asserção I define corretamente a cetoacidose diabética. A asserção II descreve o mecanismo de compensação respiratória (hiperventilação para eliminar CO2) em resposta à acidemia. A hiperventilação é uma consequência direta e tentativa de compensar a acidose metabólica, tornando II uma justificativa correta para I."
+            },
+            // Questão 10
+            {
+                caseClinical: "Um indivíduo decide prender a respiração voluntariamente o máximo de tempo que consegue. Eventualmente, ele é forçado a respirar novamente, mesmo contra sua vontade.",
+                statement: "Qual é o estímulo químico MAIS poderoso que, ao se acumular durante a apneia voluntária, ultrapassa o controle cortical e força a retomada da respiração através da estimulação dos quimiorreceptores (principalmente centrais)?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Queda crítica da PaO2 (hipoxemia severa).", value: "a" },
+                    { text: "Aumento da concentração de íons H+ (diminuição do pH) no líquido cefalorraquidiano (LCR), secundário ao aumento da PaCO2.", value: "b" },
+                    { text: "Aumento da concentração de lactato no sangue.", value: "c" },
+                    { text: "Diminuição da temperatura corporal.", value: "d" },
+                    { text: "Liberação de catecolaminas pela medula adrenal.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "Durante a apneia, o CO2 se acumula (hipercapnia). O CO2 atravessa a barreira hematoencefálica e, no LCR, forma H+, que estimula potentemente os quimiorreceptores centrais. Esse estímulo hipercapnico/acidótico central é o drive ventilatório mais forte que supera o controle voluntário."
+            }
+        ];
+
+        // Variáveis globais do quiz
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answerConfirmed = false; 
+
+        // Elementos do DOM (serão obtidos na inicialização)
+        let quizContainer;
+        let nextQuestionBtn;
+        let quizResultContainer;
+        let scoreElement;
+        let percentageElement;
+        let encouragementMessageElement;
+        // let nextSessionLink; // Removido pois esta é a última sessão de SOI I
+
+        /**
+         * Exibe a questão atual na tela.
+         * @param {number} index - O índice da questão a ser exibida.
+         */
+        function displayQuestion(index) {
+            answerConfirmed = false; 
+            const q = questions[index];
+            let optionsHtml = '';
+
+            if (!q) { 
+                console.error("Questão não encontrada no índice:", index);
+                if (questions.length > 0) { 
+                     showResults();
+                } else { 
+                    if(quizContainer) quizContainer.innerHTML = "<p class='text-center text-red-500'>Nenhuma questão carregada para este quiz.</p>";
+                }
+                return;
+            }
+
+            if (q.type === "multiple-choice" || q.type === "assertion-reason") {
+                q.options.forEach(option => {
+                    optionsHtml += `
+                        <label class="block bg-slate-50 hover:bg-sky-100 p-4 rounded-lg border border-slate-200 mb-3 cursor-pointer transition-colors duration-200">
+                            <input type="radio" name="question${index}" value="${option.value}" class="custom-radio">
+                            <span class="text-slate-700">${option.text}</span>
+                        </label>
+                    `;
+                });
+            }
+            // Adicionar lógica para outros tipos de questão se necessário (ex: true-false)
+            
+            if(quizContainer) { 
+                quizContainer.innerHTML = `
+                    <div class="question-card bg-white p-6 sm:p-8 rounded-xl shadow-xl" id="q_card_${index}">
+                        <p class="text-sm text-slate-500 mb-1">Questão ${index + 1} de ${questions.length}</p>
+                        ${q.caseClinical ? `<div class="mb-4 p-4 bg-sky-50 rounded-md text-slate-700 text-sm sm:text-base italic">${q.caseClinical}</div>` : ''}
+                        ${q.image ? `
+                            <div class="my-4 text-center">
+                                <img src="${q.image.src}" alt="${q.image.alt}" class="max-w-full h-auto mx-auto rounded-lg shadow-sm border border-slate-200" onerror="this.onerror=null; this.src='https://placehold.co/600x300/e2e8f0/64748b?text=Imagem+Indisponível'; this.alt='Imagem indisponível';">
+                                ${q.image.caption ? `<p class="text-xs text-slate-500 mt-2">${q.image.caption}</p>` : ''}
+                            </div>` : ''}
+                        <p class="font-semibold text-slate-800 mb-5 text-base sm:text-lg whitespace-pre-line">${q.statement}</p>
+                        <div class="options-container">${optionsHtml}</div>
+                        <button onclick="confirmAnswer(${index})" class="confirm-btn mt-6 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md transition-colors duration-300">
+                            Confirmar Resposta
+                        </button>
+                        <div class="feedback-area mt-4 p-4 rounded-md hidden text-sm sm:text-base"></div>
+                    </div>
+                `;
+            }
+            if(nextQuestionBtn) nextQuestionBtn.classList.add('hidden'); 
+            
+            const cardElement = document.getElementById(`q_card_${index}`);
+            if (cardElement) {
+                 cardElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        /**
+         * Confirma a resposta do usuário, calcula a pontuação e exibe o feedback.
+         * @param {number} index - O índice da questão atual.
+         */
+        function confirmAnswer(index) {
+            if (answerConfirmed) return; 
+
+            const q = questions[index];
+            if (!q) { 
+                console.error("Tentativa de confirmar resposta para questão inexistente:", index);
+                return;
+            }
+            const feedbackDiv = quizContainer ? quizContainer.querySelector(`#q_card_${index} .feedback-area`) : null;
+            const confirmBtn = quizContainer ? quizContainer.querySelector(`#q_card_${index} .confirm-btn`) : null;
+            let isCorrect = false;
+            
+            if (q.type === "multiple-choice" || q.type === "assertion-reason") {
+                const selectedOption = quizContainer ? quizContainer.querySelector(`input[name="question${index}"]:checked`) : null;
+                if (!selectedOption) { 
+                    if (feedbackDiv) {
+                        feedbackDiv.innerHTML = '<p class="font-semibold">Por favor, selecione uma alternativa.</p>';
+                        feedbackDiv.className = 'feedback-area mt-4 p-4 rounded-md bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700';
+                        feedbackDiv.classList.remove('hidden');
+                    }
+                    return;
+                }
+                isCorrect = selectedOption.value === q.correctAnswer;
+            }
+            // Adicionar lógica para outros tipos de questão se necessário
+            
+            if (feedbackDiv) { 
+                if (isCorrect) {
+                    score++;
+                    feedbackDiv.innerHTML = `<p class="font-semibold mb-1">Resposta Correta!</p><p>${q.justification}</p>`;
+                    feedbackDiv.className = 'feedback-area mt-4 p-4 rounded-md feedback-correct';
+                } else {
+                    feedbackDiv.innerHTML = `<p class="font-semibold mb-1">Resposta Incorreta.</p><p><strong>Justificativa:</strong> ${q.justification}</p>`;
+                    feedbackDiv.className = 'feedback-area mt-4 p-4 rounded-md feedback-incorrect';
+                }
+                feedbackDiv.classList.remove('hidden');
+            }
+
+            if (confirmBtn) { 
+                confirmBtn.disabled = true; 
+                confirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+            answerConfirmed = true; 
+
+            if (quizContainer) {
+                const inputs = quizContainer.querySelectorAll(`#q_card_${index} input[type="radio"]`);
+                inputs.forEach(input => input.disabled = true);
+            }
+
+            if (currentQuestionIndex < questions.length - 1) {
+                if(nextQuestionBtn) nextQuestionBtn.classList.remove('hidden');
+            } else {
+                showResults();
+            }
+        }
+
+        /**
+         * Manipula o clique no botão "Próxima Questão".
+         */
+        function handleNextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                displayQuestion(currentQuestionIndex);
+            }
+        }
+        
+        /**
+         * Exibe o resultado final do quiz.
+         */
+        function showResults() {
+            if (quizContainer) quizContainer.classList.add('hidden'); 
+            if (nextQuestionBtn) nextQuestionBtn.classList.add('hidden'); 
+            if (quizResultContainer) quizResultContainer.classList.remove('hidden');
+            
+            if (questions.length > 0) { 
+                 const calculatedPercentage = (score / questions.length) * 100;
+                 if (scoreElement) scoreElement.textContent = `Você acertou ${score} de ${questions.length} questões.`;
+                 if (percentageElement) percentageElement.textContent = `Seu aproveitamento: ${calculatedPercentage.toFixed(1)}%`;
+                 
+                 if (encouragementMessageElement) {
+                    if (calculatedPercentage >= 70) {
+                        encouragementMessageElement.textContent = "Parabéns! Você concluiu todas as sessões de SOI I com um ótimo desempenho!";
+                    } else if (calculatedPercentage >= 50) {
+                        encouragementMessageElement.textContent = "Bom trabalho ao finalizar as sessões de SOI I! Continue revisando os temas.";
+                    } else {
+                        encouragementMessageElement.textContent = "Você completou todas as sessões de SOI I! Reveja os pontos de maior dificuldade para consolidar o aprendizado.";
+                    }
+                 }
+
+            } else {
+                if (scoreElement) scoreElement.textContent = "Nenhuma questão foi carregada.";
+                if (percentageElement) percentageElement.textContent = "Aproveitamento: N/A";
+                if (encouragementMessageElement) encouragementMessageElement.textContent = "Não há questões nesta sessão.";
+            }
+            
+            // Como esta é a última sessão de SOI I, não há botão "Próxima Sessão" para SOI I.
+            // Os links para "Retornar à Seleção de Sessões (SOI I)" e "Retornar à Seleção de Disciplinas" já estão no HTML.
+
+            if (quizResultContainer) {
+                quizResultContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // Inicia o Quiz exibindo a primeira questão, se houver alguma.
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeQuizSession();
+        });
+        
+        function initializeQuizSession() {
+            quizContainer = document.getElementById('quiz-container');
+            nextQuestionBtn = document.getElementById('next-question-btn');
+            quizResultContainer = document.getElementById('quiz-result');
+            scoreElement = document.getElementById('score');
+            percentageElement = document.getElementById('percentage');
+            encouragementMessageElement = document.getElementById('encouragement-message');
+
+            currentQuestionIndex = 0;
+            score = 0;
+            answerConfirmed = false;
+
+            if (quizResultContainer) quizResultContainer.classList.add('hidden');
+            if (nextQuestionBtn) {
+                 nextQuestionBtn.classList.add('hidden');
+                 nextQuestionBtn.addEventListener('click', handleNextQuestion); // Adiciona listener aqui
+            }
+            if (quizContainer) quizContainer.classList.remove('hidden');
+
+            if (questions && questions.length > 0) {
+                displayQuestion(currentQuestionIndex);
+            } else {
+                if (quizContainer) {
+                    quizContainer.innerHTML = "<p class='text-center text-xl text-slate-700 mt-10'>Nenhuma questão disponível para esta sessão no momento.</p>";
+                }
+                showResults();
+            }
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOI I Quiz – Respi: Estrutura e Mecânica</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .question-card {
+            scroll-margin-top: 80px; /* Offset for sticky header */
+        }
+        .feedback-correct {
+            background-color: #d1fae5; /* green-100 */
+            border-left: 4px solid #10b981; /* green-500 */
+            color: #065f46; /* green-800 */
+        }
+        .feedback-incorrect {
+            background-color: #fee2e2; /* red-100 */
+            border-left: 4px solid #ef4444; /* red-500 */
+            color: #991b1b; /* red-800 */
+        }
+        /* Custom radio/checkbox appearance */
+        .custom-radio:checked {
+            background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e");
+            background-color: #2563eb; /* blue-600 */
+            border-color: #2563eb; /* blue-600 */
+        }
+        .custom-radio {
+            appearance: none;
+            -webkit-appearance: none;
+            border-radius: 50%;
+            border-width: 2px;
+            border-style: solid;
+            border-color: #9ca3af; /* gray-400 */
+            width: 1.25em;
+            height: 1.25em;
+            margin-right: 0.5em;
+            position: relative;
+            top: 0.2em;
+        }
+        .true-false-option label {
+            display: flex;
+            align-items: center;
+            margin-right: 1rem;
+            cursor: pointer;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-slate-100 text-slate-900 flex flex-col min-h-screen">
+
+    <header class="bg-white shadow-md py-5 sm:py-6 sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6">
+            <h1 class="text-2xl sm:text-3xl font-bold text-blue-600 text-center">SOI I – Quiz: Sistema Respiratório – Estrutura, Mecânica e Volumes</h1>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 sm:px-6 py-8">
+        <div class="mb-6">
+            <a href="soi_i_2bim_sessoes.html" class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors duration-300 text-base sm:text-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 sm:w-6 sm:h-6 mr-2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+                Voltar para Sessões de SOI I (2º Bim)
+            </a>
+        </div>
+
+        <div id="quiz-container">
+            </div>
+
+        <div id="navigation-buttons" class="mt-8 text-center">
+            <button id="next-question-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300 hidden">
+                Próxima Questão
+            </button>
+        </div>
+
+        <div id="quiz-result" class="hidden mt-10 bg-white p-6 sm:p-8 rounded-xl shadow-xl text-center">
+            <h2 class="text-2xl sm:text-3xl font-bold text-blue-600 mb-4">Resultado Final do Quiz</h2>
+            <p id="score" class="text-xl sm:text-2xl text-slate-700 mb-2"></p>
+            <p id="percentage" class="text-lg sm:text-xl text-slate-600 mb-4"></p>
+            <p id="encouragement-message" class="text-md text-slate-600 mb-6"></p>
+            <div class="mt-6 space-y-4 sm:space-y-0 sm:flex sm:flex-wrap sm:justify-center sm:gap-4">
+                <button onclick="window.location.reload()" class="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300">
+                    Tentar Novamente
+                </button>
+                <a href="soi_i_2bim_s4_resp_trocas_controle.html" id="next-session-link" class="w-full sm:w-auto inline-block bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300">
+                    Próxima Sessão (Respiratório: Trocas e Controle)
+                </a>
+                <a href="soi_i_2bim_sessoes.html" class="w-full sm:w-auto inline-block bg-slate-500 hover:bg-slate-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300">
+                    Retornar à Seleção de Sessões (SOI I)
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-slate-200 border-t border-slate-300 py-5 sm:py-6 mt-auto">
+        <div class="container mx-auto px-4 sm:px-6 text-center">
+            <p class="text-sm text-slate-600">© <span id="currentYear"></span> – Quiz para Estudos Médicos. Foco: 2º Bimestre.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Define o ano atual no rodapé
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Array de questões para a Sessão 3 de SOI I
+        const questions = [
+            // Questão 1
+            {
+                caseClinical: "Um paciente de 65 anos, tabagista de longa data, é diagnosticado com Doença Pulmonar Obstrutiva Crônica (DPOC) tipo enfisema. Uma radiografia de tórax revela hiperinsuflação pulmonar, com retificação das cúpulas diafragmáticas e aumento do espaço aéreo retroesternal. A espirometria mostra um VEF1/CVF < 0,70 e um aumento significativo do Volume Residual (VR) e da Capacidade Pulmonar Total (CPT).",
+                image: { src: "https://placehold.co/600x300/e2e8f0/64748b?text=Espirometria+Enfisema", alt: "Espirometria em paciente com enfisema.", caption: "Esquema ilustrativo de volumes e capacidades pulmonares (espirograma), útil para visualizar VR e CPT." },
+                statement: "No paciente com enfisema descrito, o aumento da Capacidade Pulmonar Total (CPT) e do Volume Residual (VR) são achados característicos. Qual alteração na mecânica pulmonar é a principal responsável por essas mudanças nos volumes e pela hiperinsuflação?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Aumento da retração elástica pulmonar, levando a uma maior facilidade de enchimento e dificuldade de esvaziamento.", value: "a" },
+                    { text: "Diminuição da complacência da parede torácica, restringindo a expansão pulmonar máxima.", value: "b" },
+                    { text: "Perda da retração elástica pulmonar devido à destruição do parênquima e das fibras elásticas, levando a uma maior complacência pulmonar e ao colapso prematuro de pequenas vias aéreas durante a expiração.", value: "c" },
+                    { text: "Fibrose intersticial difusa, aumentando a rigidez pulmonar e diminuindo todos os volumes e capacidades pulmonares.", value: "d" },
+                    { text: "Aumento da pressão pleural negativa, causando uma maior distensão dos alvéolos em repouso.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "No enfisema, a destruição das paredes alveolares e fibras elásticas resulta em perda da retração elástica. Isso torna os pulmões mais complacentes (fáceis de encher) mas dificulta o esvaziamento (perda da força de recolhimento). O colapso prematuro de pequenas vias aéreas aprisiona ar, aumentando VR e CPT."
+            },
+            // Questão 2
+            {
+                caseClinical: "Um indivíduo saudável realiza uma inspiração máxima seguida de uma expiração máxima. O volume de ar mobilizado nesta manobra é registrado por um espirômetro.",
+                image: { src: "https://placehold.co/600x300/e2e8f0/64748b?text=Capacidade+Vital", alt: "Espirograma mostrando Capacidade Vital.", caption: "Espirograma clássico ilustrando a Capacidade Vital (CV)." },
+                statement: "Qual dos seguintes volumes ou capacidades pulmonares representa o máximo volume de ar que pode ser exalado dos pulmões após uma inspiração máxima, sendo uma medida importante da função ventilatória global?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Volume Corrente (VC).", value: "a" },
+                    { text: "Volume Residual (VR).", value: "b" },
+                    { text: "Capacidade Inspiratória (CI).", value: "c" },
+                    { text: "Capacidade Vital (CV).", value: "d" },
+                    { text: "Capacidade Pulmonar Total (CPT).", value: "e" }
+                ],
+                correctAnswer: "d",
+                justification: "A Capacidade Vital (CV) é o volume máximo de ar exalado após uma inspiração máxima. É a soma do Volume de Reserva Inspiratório (VRI), Volume Corrente (VT) e Volume de Reserva Expiratório (VRE)."
+            },
+            // Questão 3
+            {
+                caseClinical: "Um paciente com asma brônquica está em crise. Durante a ausculta pulmonar, o médico percebe sibilos difusos, especialmente na fase expiratória. A espirometria de emergência mostra uma redução acentuada do Volume Expiratório Forçado no primeiro segundo (VEF1) e da relação VEF1/CVF.",
+                statement: "Na crise asmática, a broncoconstrição, o edema da mucosa brônquica e o aumento da secreção de muco levam a um aumento da resistência das vias aéreas. Analise as seguintes asserções:\nI. O aumento da resistência das vias aéreas, particularmente das vias de menor calibre, dificulta o fluxo aéreo, especialmente durante a expiração, quando a pressão pleural positiva comprime passivamente as vias aéreas, levando à redução do VEF1.\nPORQUE\nII. A Capacidade Vital Forçada (CVF) frequentemente se mantém normal ou está apenas levemente reduzida em crises asmáticas leves a moderadas, pois o volume total de ar que pode ser mobilizado não é primariamente afetado pela obstrução, mas sim a velocidade com que ele é exalado.",
+                type: "assertion-reason",
+                options: [
+                    { text: "As asserções I e II são proposições verdadeiras, e a II é uma justificativa correta da I.", value: "a" },
+                    { text: "As asserções I e II são proposições verdadeiras, mas a II não é uma justificativa correta da I.", value: "b" },
+                    { text: "A asserção I é uma proposição verdadeira, e a II é uma proposição falsa.", value: "c" },
+                    { text: "A asserção I é uma proposição falsa, e a II é uma proposição verdadeira.", value: "d" },
+                    { text: "As asserções I e II são proposições falsas.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "Ambas as asserções são verdadeiras. (I) A obstrução na asma reduz o VEF1. (II) A CVF pode estar relativamente preservada em crises leves/moderadas. Contudo, a II não explica diretamente a causa da queda do VEF1 descrita em I; são aspectos distintos da fisiopatologia obstrutiva."
+            },
+            // Questão 4
+            {
+                caseClinical: "Um paciente com miastenia gravis, uma doença neuromuscular que causa fraqueza muscular progressiva, começa a apresentar dispneia e dificuldade para tossir efetivamente. A avaliação da força dos músculos respiratórios é considerada.",
+                image: { src: "https://placehold.co/600x300/e2e8f0/64748b?text=Músculos+Respiratórios", alt: "Músculos da inspiração e expiração.", caption: "Esquema dos principais músculos da inspiração (diafragma, intercostais externos) e expiração forçada (abdominais, intercostais internos)." },
+                statement: "Qual é o principal músculo responsável pela inspiração tranquila (em repouso), e qual grupo muscular se torna crucial para uma expiração forçada e eficaz, como no ato de tossir?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Inspiração: Músculos intercostais externos; Expiração forçada: Músculo diafragma.", value: "a" },
+                    { text: "Inspiração: Músculo diafragma; Expiração forçada: Músculos abdominais (reto abdominal, oblíquos, transverso) e intercostais internos.", value: "b" },
+                    { text: "Inspiração: Músculos escalenos e esternocleidomastoideo; Expiração forçada: Músculos intercostais externos.", value: "c" },
+                    { text: "Inspiração: Músculos abdominais; Expiração forçada: Músculo diafragma e músculos peitorais.", value: "d" },
+                    { text: "Inspiração: Músculo diafragma e intercostais internos; Expiração forçada: Músculos intercostais externos e escalenos.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "O diafragma é o principal músculo da inspiração tranquila. Para a expiração forçada (tosse), os músculos abdominais e intercostais internos são cruciais, aumentando a pressão intra-abdominal e intratorácica."
+            },
+            // Questão 5
+            {
+                caseClinical: "Um mergulhador está a 30 metros de profundidade (aproximadamente 4 atmosferas de pressão total). Ele respira ar comprimido de um cilindro. Ao ascender rapidamente sem exalar adequadamente, ele corre o risco de barotrauma pulmonar (lesão por expansão gasosa).",
+                statement: "A Lei de Boyle (P1V1=P2V2, onde P é pressão e V é volume, com temperatura constante) descreve a relação inversa entre a pressão e o volume de um gás. Como essa lei se aplica ao risco de barotrauma pulmonar por expansão gasosa durante uma subida rápida de um mergulho sem exalação adequada?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Com a diminuição da pressão ambiente durante a subida, o volume do gás nos pulmões também diminui proporcionalmente, prevenindo o barotrauma.", value: "a" },
+                    { text: "A Lei de Boyle não se aplica a gases respiratórios em condições de mergulho, pois a temperatura varia significativamente.", value: "b" },
+                    { text: "Com a diminuição da pressão ambiente (P2 < P1) durante a subida, o volume do gás aprisionado nos pulmões (V1) tenderá a se expandir para um volume maior (V2), podendo causar ruptura alveolar se a expansão exceder a capacidade elástica dos pulmões.", value: "c" },
+                    { text: "A pressão parcial do nitrogênio no ar comprimido aumenta com a profundidade, e durante a subida, esse nitrogênio se dissolve rapidamente nos tecidos, causando o barotrauma.", value: "d" },
+                    { text: "O aumento da pressão hidrostática sobre o tórax em profundidade comprime os pulmões, e a Lei de Boyle garante que eles permaneçam comprimidos durante a subida.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "Conforme o mergulhador sobe, a pressão ambiente diminui. Pela Lei de Boyle (P1V1=P2V2), se a respiração for presa, o volume de gás nos pulmões (V1, inspirado a alta pressão P1) se expandirá (V2) à medida que a pressão externa (P2) cai, podendo causar ruptura alveolar (barotrauma)."
+            },
+            // Questão 6
+            {
+                caseClinical: "Um paciente com fibrose pulmonar idiopática apresenta queixa de dispneia progressiva aos esforços e tosse seca. A espirometria revela um padrão restritivo, com redução da Capacidade Vital Forçada (CVF) e do Volume Expiratório Forçado no primeiro segundo (VEF1), mas com a relação VEF1/CVF normal ou aumentada.",
+                image: { src: "https://placehold.co/600x300/e2e8f0/64748b?text=Padrão+Restritivo", alt: "Espirometria com padrão restritivo.", caption: "Espirograma ilustrativo de um padrão ventilatório restritivo, mostrando volumes pulmonares reduzidos." },
+                statement: "Na fibrose pulmonar, o parênquima pulmonar torna-se espessado e rígido devido à deposição excessiva de tecido conjuntivo. Qual é a principal alteração na mecânica pulmonar que caracteriza esse distúrbio restritivo e explica a redução dos volumes pulmonares?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Aumento acentuado da complacência pulmonar, permitindo que os pulmões se expandam excessivamente.", value: "a" },
+                    { text: "Diminuição da retração elástica pulmonar, levando ao colapso alveolar precoce.", value: "b" },
+                    { text: "Diminuição significativa da complacência pulmonar (aumento da rigidez ou \"dureza\" pulmonar), dificultando a expansão dos pulmões e, consequentemente, reduzindo todos os volumes e capacidades pulmonares.", value: "c" },
+                    { text: "Aumento da resistência das vias aéreas periféricas devido à inflamação crônica.", value: "d" },
+                    { text: "Aumento da pressão intrapleural em repouso, comprimindo os pulmões.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "A fibrose pulmonar causa aumento da rigidez do tecido pulmonar, ou seja, diminuição da complacência. Pulmões menos complacentes são mais difíceis de inflar, resultando na redução de todos os volumes e capacidades pulmonares (padrão restritivo)."
+            },
+            // Questão 7
+            {
+                caseClinical: "Uma paciente de 28 anos, previamente hígida, desenvolve Síndrome de Guillain-Barré após uma infecção viral. Ela apresenta fraqueza muscular ascendente progressiva, incluindo acometimento dos músculos respiratórios, necessitando de ventilação mecânica invasiva.",
+                statement: "A pressão intrapleural (ou pleural) em um indivíduo saudável em respiração espontânea é normalmente subatmosférica (negativa) durante todo o ciclo respiratório em repouso. Qual a importância dessa pressão negativa para a mecânica ventilatória?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Mantém as vias aéreas superiores abertas, prevenindo o ronco e a apneia do sono.", value: "a" },
+                    { text: "Contrabalança a tendência dos pulmões ao colapso (devido à sua retração elástica) e da parede torácica à expansão, acoplando mecanicamente os pulmões à parede torácica e permitindo que os movimentos da caixa torácica inflem os pulmões.", value: "b" },
+                    { text: "Gera um gradiente de pressão positivo que força o ar para dentro dos pulmões durante a inspiração.", value: "c" },
+                    { text: "Facilita a drenagem linfática do parênquima pulmonar, prevenindo o edema pulmonar.", value: "d" },
+                    { text: "É responsável pela produção de surfactante pelas células alveolares tipo II.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "A pressão intrapleural negativa mantém os pulmões acoplados à parede torácica, opondo-se à retração elástica pulmonar e à tendência de expansão da caixa torácica. Isso permite que os movimentos da caixa torácica inflem os pulmões."
+            },
+            // Questão 8
+            {
+                caseClinical: "Um prematuro extremo nasce com 28 semanas de gestação e desenvolve rapidamente desconforto respiratório grave, com taquipneia, retrações intercostais e cianose, necessitando de suporte ventilatório e administração de surfactante exógeno. Essa condição é conhecida como Síndrome do Desconforto Respiratório Neonatal (SDRN) ou Doença da Membrana Hialina.",
+                image: { src: "https://histologia.icb.ufg.br/images/laminas/12_respiratorio/l2-7.jpg", alt: "Alvéolo pulmonar (H).", caption: "Imagem de alvéolo pulmonar (H). Idealmente, um esquema ilustrando a tensão superficial no alvéolo e a ação do surfactante seria mais específico para a questão." },
+                statement: "Qual é a principal função do surfactante pulmonar, produzido pelas células alveolares tipo II, e como sua deficiência contribui para a fisiopatologia da Síndrome do Desconforto Respiratório Neonatal (SDRN)?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Facilitar a difusão de oxigênio através da membrana alvéolo-capilar.", value: "a" },
+                    { text: "Aumentar a tensão superficial na interface ar-líquido dos alvéolos, promovendo a estabilidade alveolar.", value: "b" },
+                    { text: "Reduzir a tensão superficial na interface ar-líquido dos alvéolos, especialmente nos de menor raio, prevenindo o colapso alveolar (atelectasia) ao final da expiração e diminuindo o trabalho respiratório.", value: "c" },
+                    { text: "Estimular a proliferação das células alveolares tipo I.", value: "d" },
+                    { text: "Atuar como um agente antimicrobiano primário no lúmen alveolar.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "O surfactante reduz a tensão superficial na interface ar-líquido alveolar, prevenindo o colapso dos alvéolos (especialmente os menores) no final da expiração e diminuindo o trabalho respiratório. Sua deficiência em prematuros causa SDRN."
+            },
+            // Questão 9
+            {
+                caseClinical: "Um paciente está sob ventilação mecânica com pressão positiva. O ventilador cicla para a expiração quando um determinado volume corrente pré-ajustado é entregue ao paciente. Durante a inspiração, a pressão nas vias aéreas atinge um pico.",
+                statement: "A complacência do sistema respiratório (Crs) é uma medida da sua distensibilidade e é definida como a variação de volume (ΔV) dividida pela variação de pressão (ΔP). Matematicamente, Crs=ΔV/ΔP. Considerando essa relação, analise as seguintes afirmações:\nI. Um paciente com edema pulmonar agudo, que torna os pulmões \"enrijecidos\" e difíceis de inflar, apresentará uma complacência do sistema respiratório diminuída, exigindo pressões mais elevadas no ventilador para atingir um mesmo volume corrente.\nPORQUE\nII. Se a complacência do sistema respiratório está aumentada (ex: enfisema inicial, sem aprisionamento aéreo significativo), uma menor variação de pressão será necessária para produzir uma determinada variação de volume, indicando que o sistema é mais facilmente distensível.",
+                type: "assertion-reason",
+                options: [
+                    { text: "As asserções I e II são proposições verdadeiras, e a II é uma justificativa correta da I.", value: "a" },
+                    { text: "As asserções I e II são proposições verdadeiras, mas a II não é uma justificativa correta da I.", value: "b" },
+                    { text: "A asserção I é uma proposição verdadeira, e a II é uma proposição falsa.", value: "c" },
+                    { text: "A asserção I é uma proposição falsa, e a II é uma proposição verdadeira.", value: "d" },
+                    { text: "As asserções I e II são proposições falsas.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "Ambas as asserções são verdadeiras. (I) Edema pulmonar reduz a complacência (aumenta rigidez), exigindo maior pressão para um dado volume. (II) Complacência aumentada (sistema mais distensível) requer menor pressão para o mesmo volume. A asserção II descreve corretamente a complacência aumentada, mas não justifica diretamente por que o edema (I) diminui a complacência; são exemplos opostos do conceito."
+            },
+            // Questão 10
+            {
+                caseClinical: "Um indivíduo respira normalmente em repouso, com um volume corrente de 500 mL e uma frequência respiratória de 12 incursões por minuto. Sabe-se que o volume do seu espaço morto anatômico é de aproximadamente 150 mL.",
+                statement: "Qual é a ventilação alveolar por minuto deste indivíduo, e por que ela é uma medida fisiologicamente mais relevante do que a ventilação pulmonar total (ou ventilação minuto) para as trocas gasosas?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Ventilação alveolar = 6000 mL/min (500 mL x 12); é mais relevante porque inclui o ar que ventila o espaço morto.", value: "a" },
+                    { text: "Ventilação alveolar = 1800 mL/min (150 mL x 12); é mais relevante porque representa o ar que não participa das trocas gasosas.", value: "b" },
+                    { text: "Ventilação alveolar = 4200 mL/min ((500 mL - 150 mL) x 12); é mais relevante porque representa o volume de ar fresco que efetivamente chega aos alvéolos e participa das trocas gasosas a cada minuto.", value: "c" },
+                    { text: "Ventilação alveolar = 5850 mL/min ((500 mL + 150 mL) x 12); é mais relevante porque considera o volume adicional necessário para preencher as vias aéreas.", value: "d" },
+                    { text: "Ventilação alveolar = 350 mL/min (500 mL - 150 mL); é mais relevante porque representa o volume de ar por incursão que chega aos alvéolos.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "Ventilação Alveolar (VA/min) = (Volume Corrente - Volume do Espaço Morto) x Frequência Respiratória = (500 mL - 150 mL) x 12/min = 350 mL x 12/min = 4200 mL/min. É mais relevante porque representa o volume de ar fresco que efetivamente participa das trocas gasosas nos alvéolos por minuto."
+            }
+        ];
+
+        // Variáveis globais do quiz
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answerConfirmed = false; 
+
+        // Elementos do DOM (serão obtidos na inicialização)
+        let quizContainer;
+        let nextQuestionBtn;
+        let quizResultContainer;
+        let scoreElement;
+        let percentageElement;
+        let encouragementMessageElement;
+        let nextSessionLink; 
+
+        /**
+         * Exibe a questão atual na tela.
+         * @param {number} index - O índice da questão a ser exibida.
+         */
+        function displayQuestion(index) {
+            answerConfirmed = false; 
+            const q = questions[index];
+            let optionsHtml = '';
+
+            if (!q) { 
+                console.error("Questão não encontrada no índice:", index);
+                if (questions.length > 0) { 
+                     showResults();
+                } else { 
+                    if(quizContainer) quizContainer.innerHTML = "<p class='text-center text-red-500'>Nenhuma questão carregada para este quiz.</p>";
+                }
+                return;
+            }
+
+            if (q.type === "multiple-choice" || q.type === "assertion-reason") {
+                q.options.forEach(option => {
+                    optionsHtml += `
+                        <label class="block bg-slate-50 hover:bg-sky-100 p-4 rounded-lg border border-slate-200 mb-3 cursor-pointer transition-colors duration-200">
+                            <input type="radio" name="question${index}" value="${option.value}" class="custom-radio">
+                            <span class="text-slate-700">${option.text}</span>
+                        </label>
+                    `;
+                });
+            }
+            // Adicionar lógica para outros tipos de questão se necessário (ex: true-false)
+            
+            if(quizContainer) { 
+                quizContainer.innerHTML = `
+                    <div class="question-card bg-white p-6 sm:p-8 rounded-xl shadow-xl" id="q_card_${index}">
+                        <p class="text-sm text-slate-500 mb-1">Questão ${index + 1} de ${questions.length}</p>
+                        ${q.caseClinical ? `<div class="mb-4 p-4 bg-sky-50 rounded-md text-slate-700 text-sm sm:text-base italic">${q.caseClinical}</div>` : ''}
+                        ${q.image ? `
+                            <div class="my-4 text-center">
+                                <img src="${q.image.src}" alt="${q.image.alt}" class="max-w-full h-auto mx-auto rounded-lg shadow-sm border border-slate-200" onerror="this.onerror=null; this.src='https://placehold.co/600x300/e2e8f0/64748b?text=Imagem+Indisponível'; this.alt='Imagem indisponível';">
+                                ${q.image.caption ? `<p class="text-xs text-slate-500 mt-2">${q.image.caption}</p>` : ''}
+                            </div>` : ''}
+                        <p class="font-semibold text-slate-800 mb-5 text-base sm:text-lg whitespace-pre-line">${q.statement}</p>
+                        <div class="options-container">${optionsHtml}</div>
+                        <button onclick="confirmAnswer(${index})" class="confirm-btn mt-6 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md transition-colors duration-300">
+                            Confirmar Resposta
+                        </button>
+                        <div class="feedback-area mt-4 p-4 rounded-md hidden text-sm sm:text-base"></div>
+                    </div>
+                `;
+            }
+            if(nextQuestionBtn) nextQuestionBtn.classList.add('hidden'); 
+            
+            const cardElement = document.getElementById(`q_card_${index}`);
+            if (cardElement) {
+                 cardElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        /**
+         * Confirma a resposta do usuário, calcula a pontuação e exibe o feedback.
+         * @param {number} index - O índice da questão atual.
+         */
+        function confirmAnswer(index) {
+            if (answerConfirmed) return; 
+
+            const q = questions[index];
+            if (!q) { 
+                console.error("Tentativa de confirmar resposta para questão inexistente:", index);
+                return;
+            }
+            const feedbackDiv = quizContainer ? quizContainer.querySelector(`#q_card_${index} .feedback-area`) : null;
+            const confirmBtn = quizContainer ? quizContainer.querySelector(`#q_card_${index} .confirm-btn`) : null;
+            let isCorrect = false;
+            
+            if (q.type === "multiple-choice" || q.type === "assertion-reason") {
+                const selectedOption = quizContainer ? quizContainer.querySelector(`input[name="question${index}"]:checked`) : null;
+                if (!selectedOption) { 
+                    if (feedbackDiv) {
+                        feedbackDiv.innerHTML = '<p class="font-semibold">Por favor, selecione uma alternativa.</p>';
+                        feedbackDiv.className = 'feedback-area mt-4 p-4 rounded-md bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700';
+                        feedbackDiv.classList.remove('hidden');
+                    }
+                    return;
+                }
+                isCorrect = selectedOption.value === q.correctAnswer;
+            }
+            // Adicionar lógica para outros tipos de questão se necessário
+            
+            if (feedbackDiv) { 
+                if (isCorrect) {
+                    score++;
+                    feedbackDiv.innerHTML = `<p class="font-semibold mb-1">Resposta Correta!</p><p>${q.justification}</p>`;
+                    feedbackDiv.className = 'feedback-area mt-4 p-4 rounded-md feedback-correct';
+                } else {
+                    feedbackDiv.innerHTML = `<p class="font-semibold mb-1">Resposta Incorreta.</p><p><strong>Justificativa:</strong> ${q.justification}</p>`;
+                    feedbackDiv.className = 'feedback-area mt-4 p-4 rounded-md feedback-incorrect';
+                }
+                feedbackDiv.classList.remove('hidden');
+            }
+
+            if (confirmBtn) { 
+                confirmBtn.disabled = true; 
+                confirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+            answerConfirmed = true; 
+
+            if (quizContainer) {
+                const inputs = quizContainer.querySelectorAll(`#q_card_${index} input[type="radio"]`);
+                inputs.forEach(input => input.disabled = true);
+            }
+
+            if (currentQuestionIndex < questions.length - 1) {
+                if(nextQuestionBtn) nextQuestionBtn.classList.remove('hidden');
+            } else {
+                showResults();
+            }
+        }
+
+        /**
+         * Manipula o clique no botão "Próxima Questão".
+         */
+        function handleNextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                displayQuestion(currentQuestionIndex);
+            }
+        }
+        
+        /**
+         * Exibe o resultado final do quiz.
+         */
+        function showResults() {
+            if (quizContainer) quizContainer.classList.add('hidden'); 
+            if (nextQuestionBtn) nextQuestionBtn.classList.add('hidden'); 
+            if (quizResultContainer) quizResultContainer.classList.remove('hidden');
+            
+            if (questions.length > 0) { 
+                 const calculatedPercentage = (score / questions.length) * 100;
+                 if (scoreElement) scoreElement.textContent = `Você acertou ${score} de ${questions.length} questões.`;
+                 if (percentageElement) percentageElement.textContent = `Seu aproveitamento: ${calculatedPercentage.toFixed(1)}%`;
+                 
+                 if (encouragementMessageElement) {
+                    if (calculatedPercentage >= 70) {
+                        encouragementMessageElement.textContent = "Excelente trabalho! Continue assim para a próxima sessão.";
+                    } else if (calculatedPercentage >= 50) {
+                        encouragementMessageElement.textContent = "Bom esforço! Reveja os pontos que errou e siga em frente.";
+                    } else {
+                        encouragementMessageElement.textContent = "Não desanime! A revisão é chave para o aprendizado. Tente novamente!";
+                    }
+                 }
+
+            } else {
+                if (scoreElement) scoreElement.textContent = "Nenhuma questão foi carregada.";
+                if (percentageElement) percentageElement.textContent = "Aproveitamento: N/A";
+                if (encouragementMessageElement) encouragementMessageElement.textContent = "Não há questões nesta sessão.";
+            }
+            
+            // Configura o link da próxima sessão
+            if (nextSessionLink) {
+                // Link para SOI I - Sessão 4 (Respiratório: Trocas e Controle)
+                nextSessionLink.href = "soi_i_2bim_s4_resp_trocas_controle.html";
+                nextSessionLink.textContent = "Próxima Sessão (Respiratório: Trocas e Controle)";
+            }
+
+            if (quizResultContainer) {
+                quizResultContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // Inicia o Quiz exibindo a primeira questão, se houver alguma.
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeQuizSession();
+        });
+        
+        function initializeQuizSession() {
+            quizContainer = document.getElementById('quiz-container');
+            nextQuestionBtn = document.getElementById('next-question-btn');
+            quizResultContainer = document.getElementById('quiz-result');
+            scoreElement = document.getElementById('score');
+            percentageElement = document.getElementById('percentage');
+            encouragementMessageElement = document.getElementById('encouragement-message');
+            nextSessionLink = document.getElementById('next-session-link'); 
+
+            currentQuestionIndex = 0;
+            score = 0;
+            answerConfirmed = false;
+
+            if (quizResultContainer) quizResultContainer.classList.add('hidden');
+            if (nextQuestionBtn) {
+                 nextQuestionBtn.classList.add('hidden');
+                 nextQuestionBtn.addEventListener('click', handleNextQuestion); // Adiciona listener aqui
+            }
+            if (quizContainer) quizContainer.classList.remove('hidden');
+
+            if (questions && questions.length > 0) {
+                displayQuestion(currentQuestionIndex);
+            } else {
+                if (quizContainer) {
+                    quizContainer.innerHTML = "<p class='text-center text-xl text-slate-700 mt-10'>Nenhuma questão disponível para esta sessão no momento.</p>";
+                }
+                showResults();
+            }
+        }
+    </script>
+
+</body>
+</html>

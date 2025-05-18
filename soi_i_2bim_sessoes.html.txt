@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOI I – Sessões do Quiz (2º Bim)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif; /* Fonte Inter como padrão */
+        }
+        /* Estilo para animação suave no hover dos cards */
+        .card-hover {
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, background-color 0.3s ease-in-out;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px); /* Leve elevação no hover */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04); /* Sombra um pouco mais pronunciada */
+            background-color: #f0f9ff; /* sky-50 - um azul bem clarinho no hover */
+        }
+        .icon-heart-lung { /* Classe específica para o ícone */
+            width: 3rem; /* 48px */
+            height: 3rem; /* 48px */
+            margin-bottom: 0.75rem; /* mb-3 */
+        }
+         @media (min-width: 640px) { /* sm breakpoint de Tailwind */
+            .icon-heart-lung {
+                width: 3.5rem; /* 56px */
+                height: 3.5rem; /* 56px */
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-slate-100 text-slate-900 flex flex-col min-h-screen">
+
+    <header class="bg-white shadow-md py-5 sm:py-6">
+        <div class="container mx-auto px-4 sm:px-6 text-center">
+            <h1 class="text-3xl sm:text-4xl font-bold text-blue-600">Sistemas Orgânicos Integrados I – Quiz do 2º Bimestre</h1>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <div class="mb-8">
+            <a href="quiz_2bim_index.html" class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors duration-300 text-base sm:text-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 sm:w-6 sm:h-6 mr-2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+                Voltar à Seleção de Disciplinas
+            </a>
+        </div>
+
+        <div class="text-center mb-10 sm:mb-12">
+            <p class="text-lg sm:text-xl text-slate-700">Escolha uma sessão de temas abaixo.</p>
+            <p class="text-base sm:text-lg text-slate-600 mt-1">Cada sessão contém 10 questões focadas no conteúdo do segundo bimestre de SOI I.</p>
+        </div>
+
+        <section>
+            <h2 class="text-2xl sm:text-3xl font-semibold text-blue-500 mb-8 text-center">Sessões de Temas – SOI I (2º Bimestre):</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-2 gap-6 sm:gap-8">
+                
+                <a href="soi_i_2bim_s1_ecg_regulacao.html" class="card-hover bg-white p-6 rounded-xl shadow-lg flex flex-col items-center text-center">
+                    <svg class="icon-heart-lung text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                    </svg>
+                    <h3 class="text-xl font-semibold text-slate-800 mb-2">Cardiovascular: Eletrofisiologia e Regulação</h3>
+                    <p class="text-slate-600 text-sm descricao-sessao">ECG (eixo, sobrecargas), controle da PA, biofísica.</p>
+                </a>
+
+                <a href="soi_i_2bim_s2_vascular_linfatico.html" class="card-hover bg-white p-6 rounded-xl shadow-lg flex flex-col items-center text-center">
+                    <svg class="icon-heart-lung text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                    </svg>
+                    <h3 class="text-xl font-semibold text-slate-800 mb-2">Cardiovascular: Vascularização e Sistema Linfático</h3>
+                    <p class="text-slate-600 text-sm descricao-sessao">Anatomia vascular (tronco, membros), linfático, microcirculação.</p>
+                </a>
+
+                <a href="soi_i_2bim_s3_resp_mecanica.html" class="card-hover bg-white p-6 rounded-xl shadow-lg flex flex-col items-center text-center">
+                     <svg class="icon-heart-lung text-cyan-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" > <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 3.75V16.5L12 14.25L7.5 16.5V3.75m9 0H12m4.5 0H12m0 0V2.25m5.25 6H12m5.25 0H12M12 2.25C12 1.83579 11.6642 1.5 11.25 1.5H4.5C4.08579 1.5 3.75 1.83579 3.75 2.25v17.12C3.75 20.1687 4.45271 20.928 5.20532 20.6916L12 18.75l6.7947 1.9416C19.5473 20.928 20.25 20.1687 20.25 19.37V8.25" /> </svg> <h3 class="text-xl font-semibold text-slate-800 mb-2">Respiratório: Estrutura, Mecânica e Volumes</h3>
+                    <p class="text-slate-600 text-sm descricao-sessao">Anatomia de vias aéreas, mecânica ventilatória, volumes e capacidades.</p>
+                </a>
+
+                <a href="soi_i_2bim_s4_resp_trocas_controle.html" class="card-hover bg-white p-6 rounded-xl shadow-lg flex flex-col items-center text-center">
+                    <svg class="icon-heart-lung text-cyan-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" > <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 3.75V16.5L12 14.25L7.5 16.5V3.75m9 0H12m4.5 0H12m0 0V2.25m5.25 6H12m5.25 0H12M12 2.25C12 1.83579 11.6642 1.5 11.25 1.5H4.5C4.08579 1.5 3.75 1.83579 3.75 2.25v17.12C3.75 20.1687 4.45271 20.928 5.20532 20.6916L12 18.75l6.7947 1.9416C19.5473 20.928 20.25 20.1687 20.25 19.37V8.25" /> </svg> <h3 class="text-xl font-semibold text-slate-800 mb-2">Respiratório: Trocas Gasosas, Transporte e Controle</h3>
+                    <p class="text-slate-600 text-sm descricao-sessao">Ventilação/perfusão, transporte de gases, equilíbrio ácido-base, controle.</p>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-slate-200 border-t border-slate-300 py-5 sm:py-6 mt-auto">
+        <div class="container mx-auto px-4 sm:px-6 text-center">
+            <p class="text-sm text-slate-600">© <span id="currentYear"></span> – Quiz para Estudos Médicos. Foco: 2º Bimestre.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Define o ano atual no rodapé
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>
+```
+
+**Principais alterações realizadas no `soi_i_2bim_sessoes.html`:**
+
+* **Tema Geral:**
+    * `<body>`: Alterado para `bg-slate-100 text-slate-900`.
+    * `<header>`: Alterado para `bg-white shadow-md`.
+    * Título principal `<h1>`: Cor alterada para `text-blue-600`.
+    * Textos e links: Cores ajustadas para bom contraste com o fundo claro.
+* **Cards das Sessões:**
+    * Fundo alterado para `bg-white shadow-lg`.
+    * Efeito hover para `hover:bg-sky-50`.
+    * Cores dos textos dos títulos e descrições ajustadas para `text-slate-800` e `text-slate-600`.
+    * Adicionei um ícone SVG de coração para as sessões cardiovasculares e um ícone SVG de pulmão (representado por um livro com detalhes que lembram vias aéreas/alvéolos) para as sessões respiratórias, para manter uma identidade visual.
+* **Rodapé:**
+    * Fundo alterado para `bg-slate-200 border-t border-slate-300`.
+    * Cor do texto ajustada para `text-slate-600`.
+
+Agora a página de seleção de sessões para SOI I deve estar visualmente consistente com as demais páginas do quiz.
+
+Peço desculpas novamente pelo erro anterior. Por favor, verifique se esta versão está corre

@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>U&E I Quiz – Trauma e Regulação</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .question-card {
+            scroll-margin-top: 80px; /* Offset for sticky header */
+        }
+        .feedback-correct {
+            background-color: #d1fae5; /* Tailwind green-100 */
+            border-left: 4px solid #10b981; /* Tailwind green-500 */
+            color: #065f46; /* Tailwind green-800 */
+        }
+        .feedback-incorrect {
+            background-color: #fee2e2; /* Tailwind red-100 */
+            border-left: 4px solid #ef4444; /* Tailwind red-500 */
+            color: #991b1b; /* Tailwind red-800 */
+        }
+        /* Custom radio button appearance */
+        .custom-radio:checked {
+            background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e");
+            background-color: #2563eb; /* Tailwind blue-600 */
+            border-color: #2563eb; /* Tailwind blue-600 */
+        }
+        .custom-radio {
+            appearance: none;
+            -webkit-appearance: none;
+            border-radius: 50%;
+            border-width: 2px;
+            border-style: solid;
+            border-color: #9ca3af; /* Tailwind gray-400 */
+            width: 1.25em;
+            height: 1.25em;
+            margin-right: 0.5em;
+            position: relative;
+            top: 0.2em;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-slate-100 text-slate-900 flex flex-col min-h-screen">
+
+    <header class="bg-white shadow-md py-5 sm:py-6 sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6">
+            <h1 class="text-2xl sm:text-3xl font-bold text-red-600 text-center">U&E I – Quiz: Atendimento ao Trauma e Regulação Médica</h1>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 sm:px-6 py-8">
+        <div class="mb-6">
+            <a href="ue_i_2bim_sessoes.html" class="inline-flex items-center text-red-600 hover:text-red-800 transition-colors duration-300 text-base sm:text-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 sm:w-6 sm:h-6 mr-2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+                Voltar para Sessões de U&E I (2º Bim)
+            </a>
+        </div>
+
+        <div id="quiz-container">
+            </div>
+
+        <div id="navigation-buttons" class="mt-8 text-center">
+            <button id="next-question-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300 hidden">
+                Próxima Questão
+            </button>
+        </div>
+
+        <div id="quiz-result" class="hidden mt-10 bg-white p-6 sm:p-8 rounded-xl shadow-xl text-center">
+            <h2 class="text-2xl sm:text-3xl font-bold text-red-600 mb-4">Resultado Final do Quiz</h2>
+            <p id="score" class="text-xl sm:text-2xl text-slate-700 mb-2"></p>
+            <p id="percentage" class="text-lg sm:text-xl text-slate-600 mb-6"></p>
+            <div class="mt-6 space-y-4 sm:space-y-0 sm:flex sm:flex-wrap sm:justify-center sm:gap-4">
+                <button onclick="window.location.reload()" class="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300">
+                    Tentar Novamente
+                </button>
+                <a href="ue_i_2bim_s3_dor_diversos.html" id="next-session-link" class="w-full sm:w-auto inline-block bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300">
+                    Próxima Sessão (Dor e Temas Diversos)
+                </a>
+                <a href="ue_i_2bim_sessoes.html" class="w-full sm:w-auto inline-block bg-slate-500 hover:bg-slate-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300">
+                    Retornar à Seleção de Sessões (U&E I)
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-slate-200 border-t border-slate-300 py-5 sm:py-6 mt-auto">
+        <div class="container mx-auto px-4 sm:px-6 text-center">
+            <p class="text-sm text-slate-600">© <span id="currentYear"></span> – Quiz para Estudos Médicos. Foco: 2º Bimestre.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Define o ano atual no rodapé
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Array de questões para a Sessão 2 de Urgência e Emergência I
+        const questions = [
+            // Questão 1
+            {
+                caseClinical: "Uma equipe de resgate é acionada para um acidente automobilístico tipo colisão frontal entre dois veículos em alta velocidade. Ao chegar à cena, observam que um dos condutores está preso às ferragens, inconsciente, e há vazamento de combustível de um dos carros. O local é uma rodovia movimentada com tráfego intenso.",
+                // Nenhuma imagem específica, foco conceitual na segurança da cena.
+                statement: "No atendimento inicial a uma vítima de trauma, qual é o primeiro e MAIS crucial passo que a equipe de resgate deve realizar ANTES de iniciar qualquer avaliação ou intervenção direta no paciente?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Realizar a avaliação primária do paciente (ABCDE do trauma) imediatamente.", value: "a" },
+                    { text: "Garantir a segurança da cena para a equipe de resgate, para o paciente e para os transeuntes, avaliando riscos como tráfego, incêndio, instabilidade estrutural e materiais perigosos.", value: "b" },
+                    { text: "Tentar remover o paciente das ferragens o mais rápido possível, utilizando qualquer meio disponível.", value: "c" },
+                    { text: "Colher informações detalhadas sobre o mecanismo do trauma com testemunhas.", value: "d" },
+                    { text: "Estabelecer um acesso venoso calibroso para iniciar a reposição volêmica.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "A segurança da cena é a prioridade máxima no atendimento pré-hospitalar ao trauma. A equipe deve garantir que o local é seguro antes de abordar a vítima para evitar novas vítimas ou agravamento da situação."
+            },
+            // Questão 2
+            {
+                caseClinical: "Um motociclista sem capacete sofre uma queda e é arremessado contra um poste. Ele é encontrado inconsciente, com respiração ruidosa e deformidade evidente na cabeça e membros. Testemunhas relatam que ele foi ejetado da moto a aproximadamente 80 km/h.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Cinemática+Trauma+Moto", 
+                    alt: "Cinemática do Trauma em Acidente de Moto", 
+                    caption: "Ilustração conceitual da cinemática do trauma em acidentes de motocicleta, destacando riscos de TCE e lesão cervical." 
+                },
+                statement: "A análise da cinemática do trauma é fundamental para antecipar lesões potenciais em vítimas de acidentes. No caso do motociclista descrito, qual tipo de lesão é ALTAMENTE suspeito e deve ser priorizado na avaliação e manejo iniciais, mesmo antes da confirmação por exames de imagem?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Fratura isolada de tornozelo.", value: "a" },
+                    { text: "Contusão pulmonar leve.", value: "b" },
+                    { text: "Lesão de coluna cervical e traumatismo cranioencefálico (TCE) grave.", value: "c" },
+                    { text: "Escoriações superficiais nos membros.", value: "d" },
+                    { text: "Distensão muscular lombar.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "A cinemática (motociclista sem capacete, ejetado em alta velocidade) sugere alta energia e risco elevado de lesão de coluna cervical e TCE grave, que são prioritários."
+            },
+            // Questão 3
+            {
+                caseClinical: "Uma pessoa liga para o serviço de emergência (SAMU 192) relatando que seu vizinho, um idoso de 75 anos, subitamente apresentou dificuldade para falar, fraqueza em um lado do corpo e desvio da boca. O solicitante está nervoso e fornece informações de forma confusa.",
+                // Nenhuma imagem específica, foco conceitual na regulação médica.
+                statement: "No processo de Regulação Médica das Urgências, o médico regulador do SAMU, ao receber uma chamada como essa, desempenha um papel crucial. Qual das seguintes ações NÃO faz parte das atribuições primárias do médico regulador nesta fase inicial do atendimento?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Identificar a natureza da urgência e o grau de risco do paciente através de perguntas direcionadas ao solicitante.", value: "a" },
+                    { text: "Orientar o solicitante sobre medidas iniciais de suporte básico de vida ou primeiros socorros, se aplicável e seguro.", value: "b" },
+                    { text: "Decidir qual tipo de recurso (ambulância de suporte básico, avançado, etc.) é o mais adequado para ser enviado ao local.", value: "c" },
+                    { text: "Deslocar-se imediatamente ao local do chamado para realizar o atendimento direto ao paciente, antes de enviar uma equipe.", value: "d" },
+                    { text: "Monitorar e orientar a equipe de resgate enviada ao local durante o atendimento e transporte do paciente.", value: "e" }
+                ],
+                correctAnswer: "d",
+                justification: "O médico regulador opera a partir da Central de Regulação, avaliando, classificando o risco, decidindo o recurso e orientando remotamente. Ele não se desloca ao local para o primeiro atendimento."
+            },
+            // Questão 4
+            {
+                caseClinical: "Um trabalhador da construção civil cai de um andaime de aproximadamente 6 metros de altura, aterrissando sobre uma superfície de concreto. Ele está consciente, mas queixa-se de dor intensa nas costas e nas pernas, com incapacidade de movimentar os membros inferiores.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Cinemática+Queda+Altura", 
+                    alt: "Cinemática de Queda de Altura", 
+                    caption: "Ilustração dos mecanismos de lesão em uma queda de altura, como compressão axial e lesões por desaceleração." 
+                },
+                statement: "A \"regra dos três impactos\" (ou colisões) é um conceito da cinemática do trauma que ajuda a prever lesões em acidentes automobilísticos, mas o princípio de múltiplas transferências de energia também se aplica a quedas. No caso de uma queda de altura significativa, qual dos seguintes mecanismos de lesão é MENOS provável de ser considerado como uma consequência direta e imediata da dissipação de energia da queda?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Lesões por compressão axial da coluna vertebral (ex: fratura de vértebras).", value: "a" },
+                    { text: "Fraturas de ossos longos dos membros inferiores (ex: fêmur, tíbia) e da pelve.", value: "b" },
+                    { text: "Lesões de órgãos internos por desaceleração (ex: laceração de fígado, baço, ruptura de aorta).", value: "c" },
+                    { text: "Traumatismo cranioencefálico, mesmo que o impacto inicial não seja diretamente na cabeça.", value: "d" },
+                    { text: "Desenvolvimento de uma infecção bacteriana secundária no local de uma escoriação superficial.", value: "e" }
+                ],
+                correctAnswer: "e",
+                justification: "Lesões por compressão axial, fraturas de membros/pelve, lesões de órgãos internos por desaceleração e TCE são consequências diretas da energia da queda. Infecção é uma complicação secundária e tardia."
+            },
+            // Questão 5
+            {
+                caseClinical: "Uma equipe do SAMU é acionada para atender uma vítima de agressão por arma de fogo em via pública, em uma área conhecida por alta criminalidade. Ao se aproximar do local indicado, a equipe ouve disparos nas proximidades.",
+                // Nenhuma imagem específica, foco conceitual na segurança da cena.
+                statement: "No contexto de atendimento a uma vítima de trauma em um cenário potencialmente hostil ou perigoso, como o descrito, qual deve ser a conduta prioritária da equipe de socorro antes de qualquer tentativa de abordagem à vítima?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Entrar rapidamente na cena para remover a vítima para um local seguro, mesmo sob risco.", value: "a" },
+                    { text: "Aguardar em um local seguro e afastado, e solicitar imediatamente apoio policial para garantir a segurança da cena antes de prosseguir com o atendimento.", value: "b" },
+                    { text: "Iniciar o atendimento à distância, gritando instruções de primeiros socorros para a vítima ou transeuntes.", value: "c" },
+                    { text: "Ligar para o hospital de referência pedindo orientações sobre como proceder em cenários de violência urbana.", value: "d" },
+                    { text: "Tentar negociar com os agressores para permitir o acesso à vítima.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "A segurança da equipe é primordial. Em cenas de violência ativa, a equipe deve aguardar em local seguro e acionar a polícia para garantir a segurança antes de entrar."
+            },
+            // Questão 6
+            {
+                caseClinical: "Um indivíduo sofre uma queda de bicicleta, batendo o guidão contra o abdômen. Inicialmente, ele refere apenas dor leve no local, mas horas depois desenvolve dor abdominal intensa, hipotensão e taquicardia, sendo diagnosticado com laceração esplênica e hemoperitônio.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Trauma+Contuso+Abdominal", 
+                    alt: "Trauma Contuso Abdominal", 
+                    caption: "Ilustração de trauma abdominal contuso e possíveis lesões internas por compressão/desaceleração." 
+                },
+                statement: "Este caso ilustra a importância de se considerar o \"índice de suspeição\" para lesões internas mesmo em traumas aparentemente leves. Qual tipo de mecanismo de trauma é exemplificado pelo impacto do guidão contra o abdômen, e qual o principal tipo de força envolvida?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Trauma penetrante; força de cisalhamento.", value: "a" },
+                    { text: "Trauma contuso (fechado); força de compressão e/ou desaceleração.", value: "b" },
+                    { text: "Barotrauma; força de expansão gasosa.", value: "c" },
+                    { text: "Trauma térmico; força de calor excessivo.", value: "d" },
+                    { text: "Trauma elétrico; força de corrente elétrica.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "O impacto do guidão é um trauma contuso (fechado). As forças envolvidas são de compressão direta dos órgãos e/ou desaceleração, podendo causar lacerações internas."
+            },
+            // Questão 7
+            {
+                caseClinical: "Após um grave acidente automobilístico, o médico regulador do SAMU precisa decidir qual o destino mais apropriado para um paciente politraumatizado grave, com TCE e suspeita de hemorragia interna. A cidade possui um hospital geral de nível secundário sem neurocirurgia e um hospital de referência em trauma de nível terciário com todos os recursos.",
+                // Nenhuma imagem específica, foco conceitual na regulação.
+                statement: "A decisão de encaminhar um paciente para um determinado hospital após o atendimento inicial no trauma faz parte do processo de regulação médica. Qual é o princípio fundamental que deve guiar a escolha do hospital de destino para uma vítima de trauma grave, visando o melhor prognóstico?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Encaminhar sempre para o hospital mais próximo do local do acidente, independentemente dos recursos disponíveis.", value: "a" },
+                    { text: "Encaminhar para o hospital onde o paciente possui convênio médico, mesmo que não seja o mais adequado para o tipo de trauma.", value: "b" },
+                    { text: "Encaminhar o paciente para o hospital com o menor tempo de espera na emergência, mesmo que de menor complexidade.", value: "c" },
+                    { text: "Encaminhar o paciente para o hospital mais adequado e com capacidade resolutiva para tratar suas lesões específicas (\"o paciente certo, para o hospital certo, no tempo certo\"), mesmo que isso implique em um tempo de transporte um pouco maior.", value: "d" },
+                    { text: "Encaminhar para o hospital que a família do paciente escolher, respeitando a autonomia familiar.", value: "e" }
+                ],
+                correctAnswer: "d",
+                justification: "O princípio da regulação no trauma grave é encaminhar o paciente para o hospital com capacidade resolutiva para suas lesões, mesmo que não seja o mais próximo, visando o tratamento definitivo."
+            },
+            // Questão 8
+            {
+                caseClinical: "Um técnico de enfermagem de uma Unidade de Suporte Básico (USB) do SAMU atende um paciente com dispneia intensa. Ele contata a Central de Regulação para discutir o caso com o médico regulador e solicitar, se necessário, o envio de uma Unidade de Suporte Avançado (USA).",
+                // Nenhuma imagem específica, foco conceitual na comunicação.
+                statement: "A comunicação entre a equipe da ambulância e o médico regulador é essencial para o bom funcionamento do sistema de atendimento pré-hospitalar. Qual das seguintes informações é MENOS relevante para o técnico da USB transmitir ao médico regulador na avaliação inicial deste paciente com dispneia?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Sinais vitais do paciente (frequência cardíaca, frequência respiratória, pressão arterial, saturação de oxigênio).", value: "a" },
+                    { text: "Queixa principal e história sucinta da doença atual.", value: "b" },
+                    { text: "Achados relevantes do exame físico simplificado (ex: presença de sibilos, tiragem intercostal, cianose).", value: "c" },
+                    { text: "As condições socioeconômicas detalhadas do paciente e de sua família.", value: "d" },
+                    { text: "Medidas de suporte já realizadas pela equipe da USB (ex: oferta de oxigênio).", value: "e" }
+                ],
+                correctAnswer: "d",
+                justification: "Informações clínicas (sinais vitais, queixa, exame, intervenções) são cruciais para a regulação. Condições socioeconômicas não são prioritárias na comunicação de uma emergência aguda para decisão médica imediata."
+            },
+            // Questão 9
+            {
+                caseClinical: "Um carro colide lateralmente contra uma árvore. O motorista, que usava cinto de segurança de três pontos, sofre um impacto significativo no lado esquerdo do tórax e abdômen. Ele se queixa de dor na região do hipocôndrio esquerdo e no ombro esquerdo (sinal de Kehr).",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Lesão+Esplênica+Sinal+Kehr", 
+                    alt: "Lesão Esplênica e Sinal de Kehr", 
+                    caption: "Ilustração da localização do baço e a relação do sinal de Kehr (dor no ombro esquerdo) com irritação diafragmática por lesão esplênica." 
+                },
+                statement: "A análise do mecanismo de trauma (colisão lateral) e a presença do sinal de Kehr (dor referida no ombro esquerdo devido à irritação diafragmática) devem levantar alta suspeita de lesão em qual órgão abdominal?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Fígado.", value: "a" },
+                    { text: "Baço.", value: "b" },
+                    { text: "Rim direito.", value: "c" },
+                    { text: "Apêndice cecal.", value: "d" },
+                    { text: "Bexiga urinária.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "O baço, localizado no quadrante superior esquerdo, é frequentemente lesado em traumas nessa região. A ruptura esplênica pode irritar o diafragma, causando dor referida no ombro esquerdo (sinal de Kehr)."
+            },
+            // Questão 10
+            {
+                caseClinical: "Uma equipe de resgate chega a um local onde ocorreu um deslizamento de terra. Há múltiplas vítimas soterradas e o terreno está instável, com risco de novos deslizamentos.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Cenário+Desastre+IMV", 
+                    alt: "Cenário de Desastre com Múltiplas Vítimas", 
+                    caption: "Ilustração de um cenário de desastre, destacando a importância da segurança da cena e do Sistema de Comando de Incidentes." 
+                },
+                statement: "Em um cenário de desastre com múltiplas vítimas (Incidente com Múltiplas Vítimas - IMV) e riscos ambientais persistentes, qual é a conduta que deve preceder a triagem e o tratamento individual das vítimas?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Iniciar imediatamente a reanimação cardiopulmonar na primeira vítima encontrada.", value: "a" },
+                    { text: "Estabelecer um posto médico avançado no centro da área de risco para otimizar o tempo de atendimento.", value: "b" },
+                    { text: "Realizar a triagem de todas as vítimas utilizando o método START, mesmo que a cena não esteja completamente segura.", value: "c" },
+                    { text: "Acionar o comando de incidentes, garantir a segurança da cena (com equipes especializadas, se necessário), delimitar zonas de risco (quente, morna, fria) e estabelecer uma área de concentração de vítimas em local seguro.", value: "d" },
+                    { text: "Transportar todas as vítimas simultaneamente para o hospital mais próximo, utilizando todos os veículos disponíveis.", value: "e" }
+                ],
+                correctAnswer: "d",
+                justification: "Em IMVs e desastres, a prioridade é a segurança da cena e a organização sob um Sistema de Comando de Incidentes. Isso inclui delimitar zonas de risco antes de iniciar a triagem e o tratamento."
+            }
+        ];
+
+        // Variáveis globais do quiz
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answerConfirmed = false; 
+
+        // Elementos do DOM
+        const quizContainer = document.getElementById('quiz-container');
+        const nextQuestionBtn = document.getElementById('next-question-btn');
+        const quizResultContainer = document.getElementById('quiz-result');
+        const scoreElement = document.getElementById('score');
+        const percentageElement = document.getElementById('percentage');
+        const nextSessionLink = document.getElementById('next-session-link'); 
+
+        /**
+         * Exibe a questão atual na tela.
+         * @param {number} index - O índice da questão a ser exibida.
+         */
+        function displayQuestion(index) {
+            answerConfirmed = false; 
+            const q = questions[index];
+            let optionsHtml = '';
+
+            if (!q) { 
+                console.error("Questão não encontrada no índice:", index);
+                if (questions.length > 0) { 
+                     showResults();
+                } else { 
+                    if(quizContainer) quizContainer.innerHTML = "<p class='text-center text-red-500'>Nenhuma questão carregada para este quiz.</p>";
+                }
+                return;
+            }
+
+            if (q.type === "multiple-choice" || q.type === "assertion-reason") {
+                q.options.forEach(option => {
+                    optionsHtml += `
+                        <label class="block bg-slate-50 hover:bg-sky-100 p-4 rounded-lg border border-slate-200 mb-3 cursor-pointer transition-colors duration-200">
+                            <input type="radio" name="question${index}" value="${option.value}" class="custom-radio">
+                            <span class="text-slate-700">${option.text}</span>
+                        </label>
+                    `;
+                });
+            }
+            
+            if(quizContainer) { 
+                quizContainer.innerHTML = `
+                    <div class="question-card bg-white p-6 sm:p-8 rounded-xl shadow-xl" id="q_card_${index}">
+                        <p class="text-sm text-slate-500 mb-1">Questão ${index + 1} de ${questions.length}</p>
+                        ${q.caseClinical ? `<div class="mb-4 p-4 bg-sky-50 rounded-md text-slate-700 text-sm sm:text-base italic">${q.caseClinical}</div>` : ''}
+                        ${q.image ? `
+                            <div class="my-4 text-center">
+                                <img src="${q.image.src}" alt="${q.image.alt}" class="max-w-full h-auto mx-auto rounded-lg shadow-sm border border-slate-200" onerror="this.onerror=null; this.src='https://placehold.co/600x300/e2e8f0/64748b?text=Imagem+Indisponível'; this.alt='Imagem indisponível';">
+                                ${q.image.caption ? `<p class="text-xs text-slate-500 mt-2">${q.image.caption}</p>` : ''}
+                            </div>` : ''}
+                        <p class="font-semibold text-slate-800 mb-5 text-base sm:text-lg whitespace-pre-line">${q.statement}</p>
+                        <div class="options-container">${optionsHtml}</div>
+                        <button onclick="confirmAnswer(${index})" class="confirm-btn mt-6 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md transition-colors duration-300">
+                            Confirmar Resposta
+                        </button>
+                        <div class="feedback-area mt-4 p-4 rounded-md hidden text-sm sm:text-base"></div>
+                    </div>
+                `;
+            }
+            if(nextQuestionBtn) nextQuestionBtn.classList.add('hidden'); 
+            
+            const cardElement = document.getElementById(`q_card_${index}`);
+            if (cardElement) {
+                 cardElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        /**
+         * Confirma a resposta do usuário, calcula a pontuação e exibe o feedback.
+         * @param {number} index - O índice da questão atual.
+         */
+        function confirmAnswer(index) {
+            if (answerConfirmed) return; 
+
+            const q = questions[index];
+            if (!q) { 
+                console.error("Tentativa de confirmar resposta para questão inexistente:", index);
+                return;
+            }
+            const feedbackDiv = quizContainer ? quizContainer.querySelector('.feedback-area') : null;
+            const confirmBtn = quizContainer ? quizContainer.querySelector('.confirm-btn') : null;
+            let isCorrect = false;
+            let selectedValue;
+            
+            if (q.type === "multiple-choice" || q.type === "assertion-reason") {
+                const selectedOption = quizContainer ? quizContainer.querySelector(`input[name="question${index}"]:checked`) : null;
+                if (!selectedOption) { 
+                    if (feedbackDiv) {
+                        feedbackDiv.innerHTML = '<p class="font-semibold">Por favor, selecione uma alternativa.</p>';
+                        feedbackDiv.className = 'feedback-area mt-4 p-4 rounded-md bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700';
+                        feedbackDiv.classList.remove('hidden');
+                    }
+                    return;
+                }
+                selectedValue = selectedOption.value;
+                isCorrect = selectedValue === q.correctAnswer;
+            }
+            
+            if (feedbackDiv) { 
+                if (isCorrect) {
+                    score++;
+                    feedbackDiv.innerHTML = `<p class="font-semibold mb-1">Resposta Correta!</p><p>${q.justification}</p>`;
+                    feedbackDiv.className = 'feedback-area mt-4 p-4 rounded-md feedback-correct';
+                } else {
+                    feedbackDiv.innerHTML = `<p class="font-semibold mb-1">Resposta Incorreta.</p><p><strong>Justificativa:</strong> ${q.justification}</p>`;
+                    feedbackDiv.className = 'feedback-area mt-4 p-4 rounded-md feedback-incorrect';
+                }
+                feedbackDiv.classList.remove('hidden');
+            }
+
+            if (confirmBtn) { 
+                confirmBtn.disabled = true; 
+                confirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+            answerConfirmed = true; 
+
+            if (quizContainer) {
+                const inputs = quizContainer.querySelectorAll('input[type="radio"]');
+                inputs.forEach(input => input.disabled = true);
+            }
+
+            if (currentQuestionIndex < questions.length - 1) {
+                if(nextQuestionBtn) nextQuestionBtn.classList.remove('hidden');
+            } else {
+                showResults();
+            }
+        }
+
+        /**
+         * Manipula o clique no botão "Próxima Questão".
+         */
+        function handleNextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                displayQuestion(currentQuestionIndex);
+            }
+        }
+        
+        if (nextQuestionBtn) { 
+            nextQuestionBtn.addEventListener('click', handleNextQuestion);
+        }
+
+        /**
+         * Exibe o resultado final do quiz.
+         */
+        function showResults() {
+            if (quizContainer) quizContainer.classList.add('hidden'); 
+            if (nextQuestionBtn) nextQuestionBtn.classList.add('hidden'); 
+            if (quizResultContainer) quizResultContainer.classList.remove('hidden');
+            
+            if (questions.length > 0) { 
+                 const calculatedPercentage = (score / questions.length) * 100;
+                 if (scoreElement) scoreElement.textContent = `Você acertou ${score} de ${questions.length} questões.`;
+                 if (percentageElement) percentageElement.textContent = `Seu aproveitamento: ${calculatedPercentage.toFixed(1)}%`;
+            } else {
+                if (scoreElement) scoreElement.textContent = "Nenhuma questão foi carregada.";
+                if (percentageElement) percentageElement.textContent = "Aproveitamento: N/A";
+            }
+
+            // Configura o link da próxima sessão
+            if (nextSessionLink) {
+                // Link para U&E I - Sessão 3
+                nextSessionLink.href = "ue_i_2bim_s3_dor_diversos.html"; 
+                nextSessionLink.textContent = "Próxima Sessão (Dor e Temas Diversos)";
+            }
+
+            if (quizResultContainer) {
+                quizResultContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // Inicia o Quiz exibindo a primeira questão, se houver alguma.
+        if (questions.length > 0) {
+            displayQuestion(currentQuestionIndex);
+        } else {
+            showResults(); 
+            if (quizContainer) { 
+                 quizContainer.innerHTML = "<p class='text-center text-xl text-slate-700 mt-10'>Nenhuma questão disponível para esta sessão no momento.</p>";
+                 quizContainer.classList.remove('hidden'); 
+            }
+        }
+    </script>
+
+</body>
+</html>

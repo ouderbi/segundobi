@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>U&E I Quiz – Emergências Neurológicas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .question-card {
+            scroll-margin-top: 80px; /* Offset for sticky header */
+        }
+        .feedback-correct {
+            background-color: #d1fae5; /* Tailwind green-100 */
+            border-left: 4px solid #10b981; /* Tailwind green-500 */
+            color: #065f46; /* Tailwind green-800 */
+        }
+        .feedback-incorrect {
+            background-color: #fee2e2; /* Tailwind red-100 */
+            border-left: 4px solid #ef4444; /* Tailwind red-500 */
+            color: #991b1b; /* Tailwind red-800 */
+        }
+        /* Custom radio button appearance */
+        .custom-radio:checked {
+            background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e");
+            background-color: #2563eb; /* Tailwind blue-600 */
+            border-color: #2563eb; /* Tailwind blue-600 */
+        }
+        .custom-radio {
+            appearance: none;
+            -webkit-appearance: none;
+            border-radius: 50%;
+            border-width: 2px;
+            border-style: solid;
+            border-color: #9ca3af; /* Tailwind gray-400 */
+            width: 1.25em;
+            height: 1.25em;
+            margin-right: 0.5em;
+            position: relative;
+            top: 0.2em;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-slate-100 text-slate-900 flex flex-col min-h-screen">
+
+    <header class="bg-white shadow-md py-5 sm:py-6 sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6">
+            <h1 class="text-2xl sm:text-3xl font-bold text-red-600 text-center">U&E I – Quiz: Emergências Neurológicas: Convulsões e AVE</h1>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 sm:px-6 py-8">
+        <div class="mb-6">
+            <a href="ue_i_2bim_sessoes.html" class="inline-flex items-center text-red-600 hover:text-red-800 transition-colors duration-300 text-base sm:text-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 sm:w-6 sm:h-6 mr-2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+                Voltar para Sessões de U&E I (2º Bim)
+            </a>
+        </div>
+
+        <div id="quiz-container">
+            </div>
+
+        <div id="navigation-buttons" class="mt-8 text-center">
+            <button id="next-question-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300 hidden">
+                Próxima Questão
+            </button>
+        </div>
+
+        <div id="quiz-result" class="hidden mt-10 bg-white p-6 sm:p-8 rounded-xl shadow-xl text-center">
+            <h2 class="text-2xl sm:text-3xl font-bold text-red-600 mb-4">Resultado Final do Quiz</h2>
+            <p id="score" class="text-xl sm:text-2xl text-slate-700 mb-2"></p>
+            <p id="percentage" class="text-lg sm:text-xl text-slate-600 mb-4"></p>
+            <p id="encouragement-message" class="text-md text-slate-600 mb-6"></p>
+            <div class="mt-6 space-y-4 sm:space-y-0 sm:flex sm:flex-wrap sm:justify-center sm:gap-4">
+                <button onclick="window.location.reload()" class="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300">
+                    Tentar Novamente
+                </button>
+                <a href="ue_i_2bim_s2_trauma_regulacao.html" id="next-session-link" class="w-full sm:w-auto inline-block bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300">
+                    Próxima Sessão (Trauma e Regulação)
+                </a>
+                <a href="ue_i_2bim_sessoes.html" class="w-full sm:w-auto inline-block bg-slate-500 hover:bg-slate-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300">
+                    Retornar à Seleção de Sessões (U&E I)
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-slate-200 border-t border-slate-300 py-5 sm:py-6 mt-auto">
+        <div class="container mx-auto px-4 sm:px-6 text-center">
+            <p class="text-sm text-slate-600">© <span id="currentYear"></span> – Quiz para Estudos Médicos. Foco: 2º Bimestre.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Define o ano atual no rodapé
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Array de questões para a Sessão 1 de Urgência e Emergência I
+        const questions = [
+            // Questão 1
+            {
+                caseClinical: "Você está em um local público quando uma pessoa de aproximadamente 30 anos subitamente cai ao chão, perde a consciência e começa a apresentar movimentos tônico-clônicos generalizados (contrações e relaxamentos musculares rítmicos e vigorosos dos membros), com duração de cerca de 2 minutos. Após os movimentos cessarem, a pessoa permanece sonolenta e confusa.",
+                statement: "Diante de uma crise convulsiva tônico-clônica generalizada como a descrita, qual das seguintes condutas de primeiros socorros é a MAIS apropriada e segura a ser realizada por um leigo ou profissional de saúde no local, enquanto se aguarda ou providencia ajuda especializada?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Tentar imobilizar os membros da pessoa para evitar que ela se machuque e colocar um objeto rígido entre seus dentes para impedir que morda a língua.", value: "a" },
+                    { text: "Proteger a cabeça da pessoa para evitar traumas, afastar objetos perigosos ao redor, lateralizar a cabeça (ou o corpo) se houver salivação excessiva ou vômito para evitar aspiração, e cronometrar a duração da crise. Não tentar conter os movimentos nem introduzir objetos na boca.", value: "b" },
+                    { text: "Jogar água fria no rosto da pessoa para tentar \"acordá-la\" e interromper a crise convulsiva imediatamente.", value: "c" },
+                    { text: "Administrar imediatamente um comprimido de diazepam sublingual, caso disponível, para cessar a atividade elétrica cerebral anormal.", value: "d" },
+                    { text: "Realizar compressões torácicas (massagem cardíaca) assim que os movimentos cessarem, pois toda crise convulsiva leva a uma parada cardiorrespiratória.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "A conduta correta é proteger a vítima de traumas, afastar objetos, lateralizar a cabeça para manter vias aéreas pérvias e observar. NÃO conter movimentos nem introduzir objetos na boca. Medicações só por profissionais e em ambiente adequado. RCP só se PCR confirmada."
+            },
+            // Questão 2
+            {
+                caseClinical: "Um senhor de 72 anos, hipertenso e diabético, é trazido ao pronto-socorro pela família. Há cerca de uma hora, ele começou a apresentar dificuldade para falar (disartria), fraqueza no braço e perna direitos, e desvio da comissura labial para a esquerda. Ele está consciente, mas confuso.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Janela+Terapêutica+AVE", 
+                    alt: "Janela Terapêutica no AVE", 
+                    caption: "Ilustração do conceito 'Tempo é Cérebro' no AVE isquêmico e a janela para trombólise." 
+                },
+                statement: "O quadro clínico descrito é altamente sugestivo de um Acidente Vascular Encefálico (AVE) agudo. Qual é a medida de tempo CRÍTICA conhecida como \"janela terapêutica\" para a administração de terapia trombolítica intravenosa (rt-PA) em muitos casos de AVE isquêmico, contada a partir do início dos sintomas, e por que a identificação rápida dos sinais e o transporte imediato ao hospital são fundamentais?",
+                type: "multiple-choice",
+                options: [
+                    { text: "12 horas; pois permite a regeneração neuronal completa se o tratamento for iniciado neste período.", value: "a" },
+                    { text: "24 horas; tempo necessário para que exames de imagem confirmem a extensão da lesão isquêmica.", value: "b" },
+                    { text: "Até 4,5 horas (em alguns casos selecionados, pode se estender um pouco mais); porque a trombólise é mais eficaz e segura para dissolver o coágulo e restaurar o fluxo sanguíneo cerebral dentro deste período, minimizando a área de necrose (infarto) e melhorando o prognóstico funcional.", value: "c" },
+                    { text: "72 horas; período em que o edema cerebral atinge seu pico e a trombólise pode ajudar a reduzi-lo.", value: "d" },
+                    { text: "1 hora; pois após este período, a maioria dos AVEs isquêmicos se converte espontaneamente em hemorrágicos, contraindicando a trombólise.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "A janela terapêutica padrão para trombólise com rt-PA no AVE isquêmico é de até 4,5 horas do início dos sintomas. O objetivo é restaurar o fluxo sanguíneo e salvar o tecido em penumbra isquêmica. 'Tempo é cérebro'."
+            },
+            // Questão 3
+            {
+                caseClinical: "Uma criança de 5 anos apresenta uma crise convulsiva febril simples durante um quadro de otite média aguda com febre de 39,5°C. A crise durou cerca de 1 minuto, foi tônico-clônica generalizada e a criança recuperou a consciência rapidamente, permanecendo sonolenta. Não há história prévia de convulsões afebris ou outras alterações neurológicas.",
+                statement: "A crise convulsiva febril simples é um evento relativamente comum na infância. Qual das seguintes características NÃO é típica de uma crise convulsiva febril SIMPLES?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Ocorre em crianças entre 6 meses e 5 anos de idade.", value: "a" },
+                    { text: "É generalizada (usualmente tônico-clônica).", value: "b" },
+                    { text: "Tem duração inferior a 15 minutos.", value: "c" },
+                    { text: "Ocorre apenas uma vez em um período de 24 horas durante o mesmo episódio febril.", value: "d" },
+                    { text: "Apresenta sinais neurológicos focais durante ou após a crise (ex: paralisia de Todd).", value: "e" }
+                ],
+                correctAnswer: "e",
+                justification: "Crise convulsiva febril simples: 6m-5a, generalizada, <15min, não recorre em 24h. Sinais focais (como paralisia de Todd) caracterizam crise febril complexa."
+            },
+            // Questão 4
+            {
+                caseClinical: "Um paciente chega à emergência com suspeita de AVE. Para diferenciar entre um AVE isquêmico (causado por obstrução de um vaso) e um AVE hemorrágico (causado por ruptura de um vaso), um exame de imagem cerebral é fundamental e deve ser realizado com urgência.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=TC+Crânio+no+AVE", 
+                    alt: "TC de Crânio no AVE", 
+                    caption: "Comparação de TC de crânio mostrando AVE isquêmico (pode ser normal inicialmente) vs. AVE hemorrágico (hiperdensidade)." 
+                },
+                statement: "Qual exame de neuroimagem é geralmente o MAIS RAPIDAMENTE disponível e eficaz na diferenciação inicial entre AVE isquêmico e AVE hemorrágico na sala de emergência, sendo crucial para a tomada de decisão terapêutica (ex: indicação ou contraindicação de trombólise)?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Ressonância Magnética (RM) de encéfalo com sequência de difusão (DWI).", value: "a" },
+                    { text: "Tomografia Computadorizada (TC) de crânio sem contraste.", value: "b" },
+                    { text: "Angiografia cerebral por cateterismo.", value: "c" },
+                    { text: "Eletroencefalograma (EEG).", value: "d" },
+                    { text: "Ultrassonografia Doppler de carótidas e vertebrais.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "A TC de crânio sem contraste é rápida, disponível e eficaz para detectar hemorragia aguda (hiperdensa), crucial para excluir AVE hemorrágico antes de considerar trombólise para AVE isquêmico."
+            },
+            // Questão 5
+            {
+                caseClinical: "Uma jovem de 20 anos, sem comorbidades conhecidas, apresenta uma crise de ausência típica: ela subitamente para a atividade que estava realizando, fica com o olhar fixo e vago por cerca de 10 segundos, com discretos automatismos manuais (como esfregar as mãos). Ela não cai nem tem movimentos convulsivos. Após o episódio, retoma a atividade como se nada tivesse acontecido, sem período pós-ictal de confusão.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=EEG+Crise+de+Ausência", 
+                    alt: "EEG em Crise de Ausência", 
+                    caption: "Traçado de EEG mostrando o padrão de complexos ponta-onda lenta generalizados a 3 Hz, típico da crise de ausência." 
+                },
+                statement: "A crise de ausência (anteriormente conhecida como \"pequeno mal\") é um tipo de crise epiléptica generalizada. Qual das seguintes opções descreve o achado eletroencefalográfico (EEG) característico durante uma crise de ausência típica?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Descargas de ondas agudas focais na região temporal.", value: "a" },
+                    { text: "Atividade delta generalizada de alta amplitude.", value: "b" },
+                    { text: "Complexos ponta-onda lenta generalizados e simétricos, com frequência de aproximadamente 3 Hz.", value: "c" },
+                    { text: "Ritmo alfa posterior suprimido e atividade beta difusa.", value: "d" },
+                    { text: "Padrão de surto-supressão.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "O achado clássico no EEG durante uma crise de ausência típica são descargas generalizadas e simétricas de complexos ponta-onda lenta a aproximadamente 3 Hz."
+            },
+            // Questão 6
+            {
+                caseClinical: "Um socorrista atende um paciente que acabou de ter uma crise convulsiva tônico-clônica generalizada. A fase convulsiva cessou, e o paciente está agora em período pós-ictal, sonolento, mas respirando espontaneamente.",
+                statement: "Após uma crise convulsiva tônico-clônica generalizada, qual é a conduta de primeiros socorros MAIS importante a ser mantida durante o período pós-ictal, enquanto o paciente recupera a consciência?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Administrar glicose oral imediatamente, pois a maioria das convulsões é causada por hipoglicemia.", value: "a" },
+                    { text: "Estimular o paciente vigorosamente para que ele acorde rapidamente e retome suas atividades.", value: "b" },
+                    { text: "Manter o paciente em decúbito lateral de segurança (posição lateral de recuperação) para garantir a permeabilidade das vias aéreas e prevenir aspiração de secreções ou vômito, monitorando a respiração até a recuperação completa da consciência.", value: "c" },
+                    { text: "Oferecer líquidos ao paciente assim que ele parar de convulsionar para prevenir desidratação.", value: "d" },
+                    { text: "Aplicar compressas frias na testa para reduzir a atividade cerebral e prevenir novas crises.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "No período pós-ictal, manter o paciente em decúbito lateral de segurança é crucial para proteger as vias aéreas e prevenir aspiração, enquanto se monitora a respiração."
+            },
+            // Questão 7
+            {
+                caseClinical: "Um paciente é trazido à emergência com quadro de afasia (dificuldade de linguagem) e hemiparesia direita de início súbito há 2 horas. A TC de crânio inicial não mostrou sangramento. Suspeita-se de AVE isquêmico em território da artéria cerebral média esquerda.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Escala+de+Cincinnati+AVE", 
+                    alt: "Escala de Cincinnati para AVE", 
+                    caption: "Ilustração dos três componentes da Escala de Cincinnati: assimetria facial, queda do braço e alteração da fala." 
+                },
+                statement: "A escala de Cincinnati Pré-hospitalar para AVE (Cincinnati Prehospital Stroke Scale - CPSS) é uma ferramenta simples e rápida para identificar POSSÍVEIS casos de AVE por socorristas leigos ou profissionais. Quais são os TRÊS componentes avaliados nesta escala?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Nível de consciência, resposta pupilar e força dos membros inferiores.", value: "a" },
+                    { text: "Desvio da comissura labial (assimetria facial ao sorrir), queda do braço (drift do membro superior ao mantê-lo estendido) e alteração da fala (disartria ou uso de palavras incorretas).", value: "b" },
+                    { text: "Presença de cefaleia súbita e intensa, vertigem e alterações visuais.", value: "c" },
+                    { text: "Frequência cardíaca, pressão arterial e frequência respiratória.", value: "d" },
+                    { text: "Orientação no tempo e espaço, capacidade de cálculo simples e memória recente.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "A Escala de Cincinnati para AVE avalia três componentes: Assimetria Facial, Queda do Braço (Drift) e Fala Anormal."
+            },
+            // Questão 8
+            {
+                caseClinical: "Um paciente está apresentando uma crise convulsiva parcial complexa, durante a qual ele exibe automatismos (como mastigação repetitiva, movimentos de tatear as roupas), olhar fixo e não responsividade ao ambiente, embora não tenha queda nem movimentos tônico-clônicos generalizados. A crise dura cerca de 90 segundos, seguida por um período de confusão.",
+                statement: "Qual é a característica fundamental que diferencia uma crise epiléptica parcial COMPLEXA de uma crise epiléptica parcial SIMPLES?",
+                type: "multiple-choice",
+                options: [
+                    { text: "A presença de movimentos motores anormais (convulsivos).", value: "a" },
+                    { text: "A duração da crise superior a 5 minutos.", value: "b" },
+                    { text: "O comprometimento ou alteração da consciência durante o evento ictal.", value: "c" },
+                    { text: "A ocorrência de sintomas sensitivos ou autonômicos.", value: "d" },
+                    { text: "A generalização secundária para uma crise tônico-clônica.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "A principal diferença entre crises parciais (focais) simples e complexas é o nível de consciência. Na simples, a consciência é preservada; na complexa, há comprometimento da consciência."
+            },
+            // Questão 9
+            {
+                caseClinical: "Um paciente de 80 anos, previamente independente, acorda pela manhã com incapacidade de mover o lado esquerdo do corpo (hemiplegia esquerda) e negligência do hemicorpo esquerdo. Ele também apresenta disartria. A família relata que ele estava bem ao ir dormir na noite anterior. O \"tempo de início dos sintomas\" é considerado o último momento em que ele foi visto bem.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=DWI-FLAIR+Mismatch+AVE", 
+                    alt: "DWI-FLAIR Mismatch no AVE", 
+                    caption: "Ilustração do conceito de DWI-FLAIR mismatch em RM para estimar o tempo de AVE." 
+                },
+                statement: "Este cenário, conhecido como \"wake-up stroke\" (AVE do despertar), representa um desafio para a indicação de terapia de reperfusão. Analise as seguintes asserções sobre o manejo do AVE:\nI. Em casos de \"wake-up stroke\" ou tempo de início incerto, exames avançados de neuroimagem, como RM com sequências de Difusão (DWI) e FLAIR, podem ajudar a estimar o tempo de evolução da isquemia e identificar pacientes que ainda podem se beneficiar da terapia de reperfusão.\nPORQUE\nII. A presença de uma área de isquemia visível na DWI sem correspondente alteração hiperintensa significativa na FLAIR (conhecido como \"DWI-FLAIR mismatch\") sugere que o infarto ocorreu há pouco tempo (geralmente < 4,5-6h), tornando o paciente um candidato potencial para reperfusão.",
+                type: "assertion-reason",
+                options: [
+                    { text: "As asserções I e II são proposições verdadeiras, e a II é uma justificativa correta da I.", value: "a" },
+                    { text: "As asserções I e II são proposições verdadeiras, mas a II não é uma justificativa correta da I.", value: "b" },
+                    { text: "A asserção I é uma proposição verdadeira, e a II é uma proposição falsa.", value: "c" },
+                    { text: "A asserção I é uma proposição falsa, e a II é uma proposição verdadeira.", value: "d" },
+                    { text: "As asserções I e II são proposições falsas.", value: "e" }
+                ],
+                correctAnswer: "a",
+                justification: "I é verdadeira (uso de RM avançada). II é verdadeira (DWI-FLAIR mismatch indica isquemia recente). II justifica o uso da RM em I para identificar candidatos à reperfusão com tempo incerto."
+            },
+            // Questão 10
+            {
+                caseClinical: "Um paciente epiléptico conhecido entra em estado de mal epiléptico (status epilepticus), definido como uma crise convulsiva contínua por mais de 5 minutos ou crises recorrentes sem recuperação completa da consciência entre elas.",
+                statement: "O estado de mal epiléptico é uma emergência neurológica que requer tratamento imediato. Qual classe de medicamentos é geralmente a primeira linha de tratamento farmacológico para interromper as crises no estado de mal epiléptico na fase pré-hospitalar ou na chegada à emergência?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Barbitúricos de ação longa (ex: fenobarbital intravenoso).", value: "a" },
+                    { text: "Benzodiazepínicos de ação rápida (ex: diazepam intravenoso/retal, lorazepam intravenoso, midazolam intramuscular/intranasal).", value: "b" },
+                    { text: "Antipsicóticos típicos (ex: haloperidol intramuscular).", value: "c" },
+                    { text: "Anti-inflamatórios não esteroidais (ex: cetoprofeno intravenoso).", value: "d" },
+                    { text: "Bloqueadores neuromusculares (ex: succinilcolina).", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "Benzodiazepínicos (diazepam, lorazepam, midazolam) são a primeira linha no estado de mal epiléptico devido ao rápido início de ação na potencialização da inibição GABAérgica."
+            }
+        ];
+
+        // Variáveis globais do quiz
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answerConfirmed = false; 
+
+        // Elementos do DOM (serão obtidos na inicialização)
+        let quizContainer;
+        let nextQuestionBtn;
+        let quizResultContainer;
+        let scoreElement;
+        let percentageElement;
+        let encouragementMessageElement;
+        let nextSessionLink; 
+
+        /**
+         * Exibe a questão atual na tela.
+         * @param {number} index - O índice da questão a ser exibida.
+         */
+        function displayQuestion(index) {
+            answerConfirmed = false; 
+            const q = questions[index];
+            let optionsHtml = '';
+
+            if (!q) { 
+                console.error("Questão não encontrada no índice:", index);
+                if (questions.length > 0) { 
+                     showResults();
+                } else { 
+                    if(quizContainer) quizContainer.innerHTML = "<p class='text-center text-red-500'>Nenhuma questão carregada para este quiz.</p>";
+                }
+                return;
+            }
+
+            if (q.type === "multiple-choice" || q.type === "assertion-reason") {
+                q.options.forEach(option => {
+                    optionsHtml += `
+                        <label class="block bg-slate-50 hover:bg-sky-100 p-4 rounded-lg border border-slate-200 mb-3 cursor-pointer transition-colors duration-200">
+                            <input type="radio" name="question${index}" value="${option.value}" class="custom-radio">
+                            <span class="text-slate-700">${option.text}</span>
+                        </label>
+                    `;
+                });
+            }
+            // Adicionar lógica para outros tipos de questão se necessário
+            
+            if(quizContainer) { 
+                quizContainer.innerHTML = `
+                    <div class="question-card bg-white p-6 sm:p-8 rounded-xl shadow-xl" id="q_card_${index}">
+                        <p class="text-sm text-slate-500 mb-1">Questão ${index + 1} de ${questions.length}</p>
+                        ${q.caseClinical ? `<div class="mb-4 p-4 bg-sky-50 rounded-md text-slate-700 text-sm sm:text-base italic">${q.caseClinical}</div>` : ''}
+                        ${q.image ? `
+                            <div class="my-4 text-center">
+                                <img src="${q.image.src}" alt="${q.image.alt}" class="max-w-full h-auto mx-auto rounded-lg shadow-sm border border-slate-200" onerror="this.onerror=null; this.src='https://placehold.co/600x300/e2e8f0/64748b?text=Imagem+Indisponível'; this.alt='Imagem indisponível';">
+                                ${q.image.caption ? `<p class="text-xs text-slate-500 mt-2">${q.image.caption}</p>` : ''}
+                            </div>` : ''}
+                        <p class="font-semibold text-slate-800 mb-5 text-base sm:text-lg whitespace-pre-line">${q.statement}</p>
+                        <div class="options-container">${optionsHtml}</div>
+                        <button onclick="confirmAnswer(${index})" class="confirm-btn mt-6 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md transition-colors duration-300">
+                            Confirmar Resposta
+                        </button>
+                        <div class="feedback-area mt-4 p-4 rounded-md hidden text-sm sm:text-base"></div>
+                    </div>
+                `;
+            }
+            if(nextQuestionBtn) nextQuestionBtn.classList.add('hidden'); 
+            
+            const cardElement = document.getElementById(`q_card_${index}`);
+            if (cardElement) {
+                 cardElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        /**
+         * Confirma a resposta do usuário, calcula a pontuação e exibe o feedback.
+         * @param {number} index - O índice da questão atual.
+         */
+        function confirmAnswer(index) {
+            if (answerConfirmed) return; 
+
+            const q = questions[index];
+            if (!q) { 
+                console.error("Tentativa de confirmar resposta para questão inexistente:", index);
+                return;
+            }
+            const feedbackDiv = quizContainer ? quizContainer.querySelector(`#q_card_${index} .feedback-area`) : null;
+            const confirmBtn = quizContainer ? quizContainer.querySelector(`#q_card_${index} .confirm-btn`) : null;
+            let isCorrect = false;
+            
+            if (q.type === "multiple-choice" || q.type === "assertion-reason") {
+                const selectedOption = quizContainer ? quizContainer.querySelector(`input[name="question${index}"]:checked`) : null;
+                if (!selectedOption) { 
+                    if (feedbackDiv) {
+                        feedbackDiv.innerHTML = '<p class="font-semibold">Por favor, selecione uma alternativa.</p>';
+                        feedbackDiv.className = 'feedback-area mt-4 p-4 rounded-md bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700';
+                        feedbackDiv.classList.remove('hidden');
+                    }
+                    return;
+                }
+                isCorrect = selectedOption.value === q.correctAnswer;
+            }
+            // Adicionar lógica para outros tipos de questão se necessário
+            
+            if (feedbackDiv) { 
+                if (isCorrect) {
+                    score++;
+                    feedbackDiv.innerHTML = `<p class="font-semibold mb-1">Resposta Correta!</p><p>${q.justification}</p>`;
+                    feedbackDiv.className = 'feedback-area mt-4 p-4 rounded-md feedback-correct';
+                } else {
+                    feedbackDiv.innerHTML = `<p class="font-semibold mb-1">Resposta Incorreta.</p><p><strong>Justificativa:</strong> ${q.justification}</p>`;
+                    feedbackDiv.className = 'feedback-area mt-4 p-4 rounded-md feedback-incorrect';
+                }
+                feedbackDiv.classList.remove('hidden');
+            }
+
+            if (confirmBtn) { 
+                confirmBtn.disabled = true; 
+                confirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+            answerConfirmed = true; 
+
+            if (quizContainer) {
+                const inputs = quizContainer.querySelectorAll(`#q_card_${index} input[type="radio"]`);
+                inputs.forEach(input => input.disabled = true);
+            }
+
+            if (currentQuestionIndex < questions.length - 1) {
+                if(nextQuestionBtn) nextQuestionBtn.classList.remove('hidden');
+            } else {
+                showResults();
+            }
+        }
+
+        /**
+         * Manipula o clique no botão "Próxima Questão".
+         */
+        function handleNextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                displayQuestion(currentQuestionIndex);
+            }
+        }
+        
+        /**
+         * Exibe o resultado final do quiz.
+         */
+        function showResults() {
+            if (quizContainer) quizContainer.classList.add('hidden'); 
+            if (nextQuestionBtn) nextQuestionBtn.classList.add('hidden'); 
+            if (quizResultContainer) quizResultContainer.classList.remove('hidden');
+            
+            if (questions.length > 0) { 
+                 const calculatedPercentage = (score / questions.length) * 100;
+                 if (scoreElement) scoreElement.textContent = `Você acertou ${score} de ${questions.length} questões.`;
+                 if (percentageElement) percentageElement.textContent = `Seu aproveitamento: ${calculatedPercentage.toFixed(1)}%`;
+                 
+                 if (encouragementMessageElement) {
+                    if (calculatedPercentage >= 70) {
+                        encouragementMessageElement.textContent = "Excelente trabalho! Continue assim para a próxima sessão.";
+                    } else if (calculatedPercentage >= 50) {
+                        encouragementMessageElement.textContent = "Bom esforço! Reveja os pontos que errou e siga em frente.";
+                    } else {
+                        encouragementMessageElement.textContent = "Não desanime! A revisão é chave para o aprendizado. Tente novamente!";
+                    }
+                 }
+
+            } else {
+                if (scoreElement) scoreElement.textContent = "Nenhuma questão foi carregada.";
+                if (percentageElement) percentageElement.textContent = "Aproveitamento: N/A";
+                if (encouragementMessageElement) encouragementMessageElement.textContent = "Não há questões nesta sessão.";
+            }
+            
+            // Configura o link da próxima sessão
+            if (nextSessionLink) {
+                // Link para U&E I - Sessão 2 (Trauma e Regulação)
+                nextSessionLink.href = "ue_i_2bim_s2_trauma_regulacao.html";
+                nextSessionLink.textContent = "Próxima Sessão (Trauma e Regulação)";
+            }
+
+
+            if (quizResultContainer) {
+                quizResultContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // Inicia o Quiz exibindo a primeira questão, se houver alguma.
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeQuizSession();
+        });
+        
+        function initializeQuizSession() {
+            quizContainer = document.getElementById('quiz-container');
+            nextQuestionBtn = document.getElementById('next-question-btn');
+            quizResultContainer = document.getElementById('quiz-result');
+            scoreElement = document.getElementById('score');
+            percentageElement = document.getElementById('percentage');
+            encouragementMessageElement = document.getElementById('encouragement-message');
+            nextSessionLink = document.getElementById('next-session-link'); 
+
+            currentQuestionIndex = 0;
+            score = 0;
+            answerConfirmed = false;
+
+            if (quizResultContainer) quizResultContainer.classList.add('hidden');
+            if (nextQuestionBtn) {
+                 nextQuestionBtn.classList.add('hidden');
+                 nextQuestionBtn.addEventListener('click', handleNextQuestion); // Adiciona listener aqui
+            }
+            if (quizContainer) quizContainer.classList.remove('hidden');
+
+            if (questions && questions.length > 0) {
+                displayQuestion(currentQuestionIndex);
+            } else {
+                if (quizContainer) {
+                    quizContainer.innerHTML = "<p class='text-center text-xl text-slate-700 mt-10'>Nenhuma questão disponível para esta sessão no momento.</p>";
+                }
+                showResults();
+            }
+        }
+    </script>
+
+</body>
+</html>

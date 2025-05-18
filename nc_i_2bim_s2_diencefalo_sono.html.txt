@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NC I Quiz – Diencéfalo e Sono</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .question-card {
+            scroll-margin-top: 80px; /* Offset for sticky header */
+        }
+        .feedback-correct {
+            background-color: #d1fae5; /* Tailwind green-100 */
+            border-left: 4px solid #10b981; /* Tailwind green-500 */
+            color: #065f46; /* Tailwind green-800 */
+        }
+        .feedback-incorrect {
+            background-color: #fee2e2; /* Tailwind red-100 */
+            border-left: 4px solid #ef4444; /* Tailwind red-500 */
+            color: #991b1b; /* Tailwind red-800 */
+        }
+        /* Custom radio button appearance */
+        .custom-radio:checked {
+            background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e");
+            background-color: #2563eb; /* Tailwind blue-600 */
+            border-color: #2563eb; /* Tailwind blue-600 */
+        }
+        .custom-radio {
+            appearance: none;
+            -webkit-appearance: none;
+            border-radius: 50%;
+            border-width: 2px;
+            border-style: solid;
+            border-color: #9ca3af; /* Tailwind gray-400 */
+            width: 1.25em;
+            height: 1.25em;
+            margin-right: 0.5em;
+            position: relative;
+            top: 0.2em;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-slate-100 text-slate-900 flex flex-col min-h-screen">
+
+    <header class="bg-white shadow-md py-5 sm:py-6 sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6">
+            <h1 class="text-2xl sm:text-3xl font-bold text-blue-600 text-center">Neurociências I – Quiz: Diencéfalo, Sono e Ritmos Cerebrais</h1>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 sm:px-6 py-8">
+        <div class="mb-6">
+            <a href="nc_i_2bim_sessoes.html" class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors duration-300 text-base sm:text-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 sm:w-6 sm:h-6 mr-2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+                Voltar para Sessões de NC I (2º Bim)
+            </a>
+        </div>
+
+        <div id="quiz-container">
+            </div>
+
+        <div id="navigation-buttons" class="mt-8 text-center">
+            <button id="next-question-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300 hidden">
+                Próxima Questão
+            </button>
+        </div>
+
+        <div id="quiz-result" class="hidden mt-10 bg-white p-6 sm:p-8 rounded-xl shadow-xl text-center">
+            <h2 class="text-2xl sm:text-3xl font-bold text-blue-600 mb-4">Resultado Final do Quiz</h2>
+            <p id="score" class="text-xl sm:text-2xl text-slate-700 mb-2"></p>
+            <p id="percentage" class="text-lg sm:text-xl text-slate-600 mb-4"></p>
+            <p id="encouragement-message" class="text-md text-slate-600 mb-6"></p>
+            <div class="mt-6 space-y-4 sm:space-y-0 sm:flex sm:flex-wrap sm:justify-center sm:gap-4">
+                <button onclick="window.location.reload()" class="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300">
+                    Tentar Novamente
+                </button>
+                <a href="nc_i_2bim_s3_sensorial_plexos.html" id="next-session-link" class="w-full sm:w-auto inline-block bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300">
+                    Próxima Sessão (Sistemas Sensoriais e Plexos)
+                </a>
+                <a href="nc_i_2bim_sessoes.html" class="w-full sm:w-auto inline-block bg-slate-500 hover:bg-slate-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300">
+                    Retornar à Seleção de Sessões (NC I)
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-slate-200 border-t border-slate-300 py-5 sm:py-6 mt-auto">
+        <div class="container mx-auto px-4 sm:px-6 text-center">
+            <p class="text-sm text-slate-600">© <span id="currentYear"></span> – Quiz para Estudos Médicos. Foco: 2º Bimestre.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Define o ano atual no rodapé
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Array de questões para a Sessão 2 de Neurociências I
+        const questions = [
+            // Questão 1
+            {
+                caseClinical: "Um paciente de 50 anos sofre um acidente vascular encefálico (AVE) isquêmico que afeta seletivamente o núcleo ventral posterolateral (VPL) do tálamo direito. Após o evento, ele desenvolve alterações sensitivas específicas.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Núcleos+Talâmicos", 
+                    alt: "Núcleos do Tálamo", 
+                    caption: "Esquema ilustrativo dos principais núcleos talâmicos e suas conexões." 
+                },
+                statement: "O tálamo é uma estrutura diencefálica crucial que atua como uma estação retransmissora para a maioria das informações sensoriais que se destinam ao córtex cerebral. Considerando a organização somatotópica e funcional dos núcleos talâmicos, qual seria o déficit neurológico mais provável em um paciente com lesão isquêmica do núcleo ventral posterolateral (VPL) do tálamo direito?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Perda da visão no hemicampo visual esquerdo (hemianopsia homônima esquerda).", value: "a" },
+                    { text: "Perda da sensibilidade tátil, proprioceptiva, vibratória e dolorosa no hemicorpo esquerdo (face, tronco e membros).", value: "b" },
+                    { text: "Afasia de Wernicke, com dificuldade na compreensão da linguagem.", value: "c" },
+                    { text: "Perda da sensibilidade tátil, proprioceptiva, vibratória e dolorosa no hemicorpo direito, poupando a face.", value: "d" },
+                    { text: "Hemiparesia contralateral (esquerda) com hiperreflexia e sinal de Babinski.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "O núcleo ventral posterolateral (VPL) do tálamo recebe aferências das vias do lemnisco medial e espinotalâmica (sensibilidade do tronco e membros contralaterais). Lesão no VPL direito causa perda sensitiva no hemicorpo esquerdo. A face é VPM."
+            },
+            // Questão 2
+            {
+                caseClinical: "Uma paciente com um craniofaringioma (tumor benigno que frequentemente comprime estruturas na região selar e suprasselar) desenvolve poliúria (produção excessiva de urina) e polidipsia (sede excessiva). A investigação hormonal revela deficiência na secreção de hormônio antidiurético (ADH).",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Eixo+Hipotálamo-Hipófise", 
+                    alt: "Eixo Hipotálamo-Hipófise", 
+                    caption: "Diagrama do eixo hipotálamo-hipofisário, destacando a neuro-hipófise e a produção de ADH." 
+                },
+                statement: "O hipotálamo, parte do diencéfalo, desempenha um papel central na regulação de múltiplas funções homeostáticas, incluindo o balanço hídrico. A deficiência de ADH, resultando em diabetes insipidus central, ocorre devido à disfunção em qual parte do eixo hipotálamo-hipofisário?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Produção deficiente de ADH pelos núcleos supraóptico e paraventricular do hipotálamo e/ou interrupção do seu transporte axonal para a neuro-hipófise (hipófise posterior) para armazenamento e liberação.", value: "a" },
+                    { text: "Secreção excessiva de ocitocina pela neuro-hipófise, que antagoniza os efeitos do ADH nos rins.", value: "b" },
+                    { text: "Produção e secreção excessiva de hormônios liberadores pela adeno-hipófise (hipófise anterior), que inibem a ação do ADH.", value: "c" },
+                    { text: "Lesão dos rins, tornando-os insensíveis à ação do ADH (diabetes insipidus nefrogênico).", value: "d" },
+                    { text: "Disfunção da glândula pineal, levando a um desequilíbrio na regulação do ciclo sono-vigília que afeta a liberação de ADH.", value: "e" }
+                ],
+                correctAnswer: "a",
+                justification: "O ADH é produzido nos núcleos supraóptico e paraventricular do hipotálamo e armazenado/liberado pela neuro-hipófise. Lesões nessas áreas ou no transporte causam diabetes insipidus central."
+            },
+            // Questão 3
+            {
+                caseClinical: "Um paciente refere sonolência diurna excessiva e dificuldade em manter um padrão de sono regular, apesar de seguir uma rotina de horários para dormir e acordar. Ele trabalha em turnos noturnos alternados. Exames complementares descartaram apneia do sono e outras causas orgânicas.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Glandula+Pineal+e+Melatonina", 
+                    alt: "Glandula Pineal e Melatonina", 
+                    caption: "Esquema da glândula pineal e a influência da luz na secreção de melatonina." 
+                },
+                statement: "A glândula pineal, uma estrutura do epitálamo, é conhecida por sua produção de melatonina. Qual é o principal papel da melatonina na regulação do ciclo sono-vigília e qual fator ambiental primariamente influencia sua secreção?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Estimular diretamente os centros da vigília no tronco encefálico; sua secreção é aumentada pela exposição à luz brilhante.", value: "a" },
+                    { text: "Atuar como um potente indutor do sono REM; sua secreção é controlada pela temperatura corporal.", value: "b" },
+                    { text: "Sincronizar o ritmo circadiano endógeno com o ciclo claro-escuro ambiental, promovendo o sono em resposta à escuridão e sendo suprimida pela luz; sua secreção aumenta à noite.", value: "c" },
+                    { text: "Regular o apetite e o metabolismo energético durante o sono; sua secreção é estimulada pela ingestão de triptofano.", value: "d" },
+                    { text: "Modular a liberação de hormônio do crescimento durante as fases de sono profundo; sua secreção é independente de fatores ambientais.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "A melatonina, produzida pela pineal, sincroniza o ritmo circadiano com o ciclo claro-escuro. Sua secreção aumenta no escuro (promovendo o sono) e é suprimida pela luz."
+            },
+            // Questão 4
+            {
+                caseClinical: "Durante um estudo de polissonografia, um indivíduo saudável passa por diferentes estágios de sono. O eletroencefalograma (EEG) registra padrões de atividade elétrica cerebral característicos de cada estágio.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=EEG+Sono+REM", 
+                    alt: "EEG no Sono REM", 
+                    caption: "Padrão de EEG típico do sono REM, comparado ao da vigília." 
+                },
+                statement: "O sono REM (Rapid Eye Movement) é um estágio do sono fundamental para a consolidação da memória e processamento emocional, caracterizado por atonia muscular (exceto músculos oculares e diafragma) e atividade onírica vívida. Qual padrão de atividade elétrica cerebral é tipicamente observado no EEG durante o sono REM, e como ele se compara ao EEG da vigília?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Ondas delta de alta amplitude e baixa frequência (sono de ondas lentas), similar ao sono profundo não-REM.", value: "a" },
+                    { text: "Fusos de sono e complexos K, característicos do estágio N2 do sono não-REM.", value: "b" },
+                    { text: "Atividade de baixa voltagem e frequência mista (ondas rápidas, dessincronizadas), com algumas ondas teta, assemelhando-se ao padrão do EEG da vigília ativa ou do estágio N1 do sono.", value: "c" },
+                    { text: "Ondas alfa regulares e sincronizadas (8-13 Hz), típicas da vigília relaxada com os olhos fechados.", value: "d" },
+                    { text: "Ausência completa de atividade elétrica cerebral detectável (linha isoelétrica).", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "O EEG do sono REM mostra atividade de baixa voltagem e frequência mista (dessincronizada), similar ao da vigília ativa ou sono N1, sendo por isso chamado de 'sono paradoxal'."
+            },
+            // Questão 5
+            {
+                caseClinical: "Um paciente com lesão bilateral dos núcleos anteriores do tálamo, secundária a um infarto talâmico, apresenta déficits de memória anterógrada significativos e alterações comportamentais.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Circuito+de+Papez", 
+                    alt: "Circuito de Papez", 
+                    caption: "Diagrama do circuito de Papez, destacando os núcleos anteriores do tálamo e suas conexões." 
+                },
+                statement: "Os núcleos anteriores do tálamo fazem parte de um importante circuito límbico conhecido como circuito de Papez, que está classicamente associado à memória e às emoções. Com quais estruturas principais os núcleos anteriores do tálamo estabelecem conexões recíprocas dentro deste circuito?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Córtex visual primário e colículos superiores.", value: "a" },
+                    { text: "Corpos mamilares (do hipotálamo) e o giro do cíngulo (córtex cingulado).", value: "b" },
+                    { text: "Núcleos da base (putâmen e globo pálido) e córtex motor primário.", value: "c" },
+                    { text: "Amígdala e córtex pré-frontal orbital.", value: "d" },
+                    { text: "Cerebelo (núcleo denteado) e córtex parietal posterior.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "No circuito de Papez, os núcleos anteriores do tálamo recebem aferências dos corpos mamilares (via trato mamilotalâmico) e projetam para o córtex do giro do cíngulo."
+            },
+            // Questão 6
+            {
+                caseClinical: "Um paciente apresenta queixa de fome excessiva (hiperfagia) e ganho de peso significativo e rápido, sem causa aparente. A investigação aponta para uma possível disfunção hipotalâmica.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Centros+Fome+e+Saciedade", 
+                    alt: "Centros hipotalâmicos da fome e saciedade", 
+                    caption: "Esquema do hipotálamo indicando o núcleo ventromedial (saciedade) e o hipotálamo lateral (fome)." 
+                },
+                statement: "O hipotálamo contém centros importantes para a regulação do comportamento alimentar e do balanço energético. Qual núcleo hipotalâmico é tradicionalmente considerado um \"centro da saciedade\", cuja lesão pode levar à hiperfagia e obesidade, e qual núcleo é considerado um \"centro da fome\", cuja lesão pode causar anorexia?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Centro da saciedade: Núcleo arqueado; Centro da fome: Núcleo supraquiasmático.", value: "a" },
+                    { text: "Centro da saciedade: Hipotálamo lateral; Centro da fome: Núcleo ventromedial.", value: "b" },
+                    { text: "Centro da saciedade: Núcleo ventromedial; Centro da fome: Hipotálamo lateral.", value: "c" },
+                    { text: "Centro da saciedade: Núcleo paraventricular; Centro da fome: Núcleo supraóptico.", value: "d" },
+                    { text: "Centro da saciedade: Corpos mamilares; Centro da fome: Área pré-óptica.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "Classicamente, o núcleo ventromedial (NVM) do hipotálamo é o 'centro da saciedade' (lesão = hiperfagia), e o hipotálamo lateral (HL) é o 'centro da fome' (lesão = anorexia)."
+            },
+            // Questão 7
+            {
+                caseClinical: "Um indivíduo que viajou rapidamente através de múltiplos fusos horários (jet lag) experimenta dessincronização do seu ciclo sono-vigília com o novo ambiente, sentindo sonolência durante o dia e insônia à noite.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Núcleo+Supraquiasmático", 
+                    alt: "Núcleo Supraquiasmático", 
+                    caption: "Localização do núcleo supraquiasmático e sua conexão com a retina (trato retino-hipotalâmico)." 
+                },
+                statement: "Qual núcleo hipotalâmico é considerado o principal \"relógio biológico\" mestre do organismo, responsável por gerar ritmos circadianos endógenos e por ser sincronizado (ajustado) primariamente pelo ciclo claro-escuro ambiental através de aferências da retina?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Núcleo supraóptico.", value: "a" },
+                    { text: "Núcleo paraventricular.", value: "b" },
+                    { text: "Núcleo supraquiasmático.", value: "c" },
+                    { text: "Núcleo arqueado (infundibular).", value: "d" },
+                    { text: "Núcleos mamilares.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "O núcleo supraquiasmático (NSQ) do hipotálamo é o principal marcapasso circadiano, recebendo informações luminosas da retina para sincronizar os ritmos biológicos com o ciclo dia-noite."
+            },
+            // Questão 8
+            {
+                caseClinical: "Um paciente com epilepsia de lobo temporal realiza um eletroencefalograma (EEG) para investigação. Durante o exame em vigília, com o paciente relaxado e de olhos fechados, observa-se um ritmo predominante nas regiões posteriores do escalpo.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Ritmo+Alfa+EEG", 
+                    alt: "Ritmo Alfa no EEG", 
+                    caption: "Exemplo de traçado de EEG mostrando o ritmo alfa (8-13 Hz) em vigília relaxada." 
+                },
+                statement: "Qual ritmo de ondas cerebrais, caracterizado por uma frequência de 8 a 13 Hz e amplitude moderada, é tipicamente dominante no EEG de um adulto em estado de vigília relaxada, com os olhos fechados, especialmente nas regiões occipitais e parietais, e é atenuado ou bloqueado pela abertura dos olhos ou pela atenção mental?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Ondas delta (0.5-4 Hz).", value: "a" },
+                    { text: "Ondas teta (4-7 Hz).", value: "b" },
+                    { text: "Ondas alfa (8-13 Hz).", value: "c" },
+                    { text: "Ondas beta (>13 Hz, geralmente 14-30 Hz).", value: "d" },
+                    { text: "Ondas gama (>30 Hz).", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "O ritmo alfa (8-13 Hz) é característico da vigília relaxada com olhos fechados, predominante nas regiões posteriores, e é atenuado pela abertura dos olhos ou atenção."
+            },
+            // Questão 9
+            {
+                caseClinical: "Um paciente sofre uma lesão hipotalâmica que afeta os mecanismos de termorregulação. Ele apresenta dificuldade em manter a temperatura corporal estável, com episódios de hipertermia ou hipotermia dependendo da temperatura ambiente.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Termorregulação+Hipotálamo", 
+                    alt: "Termorregulação pelo Hipotálamo", 
+                    caption: "Esquema do hipotálamo destacando a área pré-óptica/anterior (sensível ao calor) e o hipotálamo posterior (sensível ao frio)." 
+                },
+                statement: "O hipotálamo atua como o principal centro integrador da termorregulação no corpo. Qual região específica do hipotálamo é primariamente responsável por detectar o \"aquecimento\" do corpo (aumento da temperatura sanguínea) e desencadear respostas para dissipar calor (como vasodilatação cutânea e sudorese)?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Hipotálamo posterior.", value: "a" },
+                    { text: "Área pré-óptica e hipotálamo anterior.", value: "b" },
+                    { text: "Núcleo dorsomedial.", value: "c" },
+                    { text: "Corpos mamilares.", value: "d" },
+                    { text: "Hipotálamo lateral.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "A área pré-óptica e o hipotálamo anterior contêm neurônios sensíveis ao calor e desencadeiam mecanismos de perda de calor. O hipotálamo posterior está mais envolvido na resposta ao frio."
+            },
+            // Questão 10
+            {
+                caseClinical: "Durante a fase N3 do sono não-REM (também conhecida como sono de ondas lentas ou sono profundo), observa-se no EEG a predominância de ondas de alta amplitude e baixa frequência. Esta fase é crucial para a restauração física e consolidação de certos tipos de memória.",
+                image: { 
+                    src: "https://placehold.co/600x300/e2e8f0/64748b?text=Ondas+Delta+Sono+N3", 
+                    alt: "Ondas Delta no Sono N3", 
+                    caption: "Exemplo de traçado de EEG mostrando ondas delta de alta amplitude e baixa frequência, características do sono N3." 
+                },
+                statement: "As ondas cerebrais de alta amplitude e baixa frequência (tipicamente 0.5 a 2 Hz ou até 4 Hz) que caracterizam o sono N3 (sono profundo) são denominadas:",
+                type: "multiple-choice",
+                options: [
+                    { text: "Ondas alfa.", value: "a" },
+                    { text: "Ondas beta.", value: "b" },
+                    { text: "Fusos de sono.", value: "c" },
+                    { text: "Ondas delta.", value: "d" },
+                    { text: "Complexos K.", value: "e" }
+                ],
+                correctAnswer: "d",
+                justification: "As ondas delta (0.5-4 Hz, tipicamente < 2 Hz no N3) são ondas de baixa frequência e alta amplitude que marcam o sono N3 (sono de ondas lentas ou profundo). Fusos de sono e complexos K são do estágio N2."
+            }
+        ];
+
+        // Variáveis globais do quiz
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answerConfirmed = false; 
+
+        // Elementos do DOM (serão obtidos na inicialização)
+        let quizContainer;
+        let nextQuestionBtn;
+        let quizResultContainer;
+        let scoreElement;
+        let percentageElement;
+        let encouragementMessageElement;
+        let nextSessionLink; 
+
+        /**
+         * Exibe a questão atual na tela.
+         * @param {number} index - O índice da questão a ser exibida.
+         */
+        function displayQuestion(index) {
+            answerConfirmed = false; 
+            const q = questions[index];
+            let optionsHtml = '';
+
+            if (!q) { 
+                console.error("Questão não encontrada no índice:", index);
+                if (questions.length > 0) { 
+                     showResults();
+                } else { 
+                    if(quizContainer) quizContainer.innerHTML = "<p class='text-center text-red-500'>Nenhuma questão carregada para este quiz.</p>";
+                }
+                return;
+            }
+
+            if (q.type === "multiple-choice" || q.type === "assertion-reason") {
+                q.options.forEach(option => {
+                    optionsHtml += `
+                        <label class="block bg-slate-50 hover:bg-sky-100 p-4 rounded-lg border border-slate-200 mb-3 cursor-pointer transition-colors duration-200">
+                            <input type="radio" name="question${index}" value="${option.value}" class="custom-radio">
+                            <span class="text-slate-700">${option.text}</span>
+                        </label>
+                    `;
+                });
+            }
+            // Adicionar lógica para outros tipos de questão se necessário
+            
+            if(quizContainer) { 
+                quizContainer.innerHTML = `
+                    <div class="question-card bg-white p-6 sm:p-8 rounded-xl shadow-xl" id="q_card_${index}">
+                        <p class="text-sm text-slate-500 mb-1">Questão ${index + 1} de ${questions.length}</p>
+                        ${q.caseClinical ? `<div class="mb-4 p-4 bg-sky-50 rounded-md text-slate-700 text-sm sm:text-base italic">${q.caseClinical}</div>` : ''}
+                        ${q.image ? `
+                            <div class="my-4 text-center">
+                                <img src="${q.image.src}" alt="${q.image.alt}" class="max-w-full h-auto mx-auto rounded-lg shadow-sm border border-slate-200" onerror="this.onerror=null; this.src='https://placehold.co/600x300/e2e8f0/64748b?text=Imagem+Indisponível'; this.alt='Imagem indisponível';">
+                                ${q.image.caption ? `<p class="text-xs text-slate-500 mt-2">${q.image.caption}</p>` : ''}
+                            </div>` : ''}
+                        <p class="font-semibold text-slate-800 mb-5 text-base sm:text-lg whitespace-pre-line">${q.statement}</p>
+                        <div class="options-container">${optionsHtml}</div>
+                        <button onclick="confirmAnswer(${index})" class="confirm-btn mt-6 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md transition-colors duration-300">
+                            Confirmar Resposta
+                        </button>
+                        <div class="feedback-area mt-4 p-4 rounded-md hidden text-sm sm:text-base"></div>
+                    </div>
+                `;
+            }
+            if(nextQuestionBtn) nextQuestionBtn.classList.add('hidden'); 
+            
+            const cardElement = document.getElementById(`q_card_${index}`);
+            if (cardElement) {
+                 cardElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        /**
+         * Confirma a resposta do usuário, calcula a pontuação e exibe o feedback.
+         * @param {number} index - O índice da questão atual.
+         */
+        function confirmAnswer(index) {
+            if (answerConfirmed) return; 
+
+            const q = questions[index];
+            if (!q) { 
+                console.error("Tentativa de confirmar resposta para questão inexistente:", index);
+                return;
+            }
+            const feedbackDiv = quizContainer ? quizContainer.querySelector(`#q_card_${index} .feedback-area`) : null;
+            const confirmBtn = quizContainer ? quizContainer.querySelector(`#q_card_${index} .confirm-btn`) : null;
+            let isCorrect = false;
+            
+            if (q.type === "multiple-choice" || q.type === "assertion-reason") {
+                const selectedOption = quizContainer ? quizContainer.querySelector(`input[name="question${index}"]:checked`) : null;
+                if (!selectedOption) { 
+                    if (feedbackDiv) {
+                        feedbackDiv.innerHTML = '<p class="font-semibold">Por favor, selecione uma alternativa.</p>';
+                        feedbackDiv.className = 'feedback-area mt-4 p-4 rounded-md bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700';
+                        feedbackDiv.classList.remove('hidden');
+                    }
+                    return;
+                }
+                isCorrect = selectedOption.value === q.correctAnswer;
+            }
+            // Adicionar lógica para outros tipos de questão se necessário
+            
+            if (feedbackDiv) { 
+                if (isCorrect) {
+                    score++;
+                    feedbackDiv.innerHTML = `<p class="font-semibold mb-1">Resposta Correta!</p><p>${q.justification}</p>`;
+                    feedbackDiv.className = 'feedback-area mt-4 p-4 rounded-md feedback-correct';
+                } else {
+                    feedbackDiv.innerHTML = `<p class="font-semibold mb-1">Resposta Incorreta.</p><p><strong>Justificativa:</strong> ${q.justification}</p>`;
+                    feedbackDiv.className = 'feedback-area mt-4 p-4 rounded-md feedback-incorrect';
+                }
+                feedbackDiv.classList.remove('hidden');
+            }
+
+            if (confirmBtn) { 
+                confirmBtn.disabled = true; 
+                confirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+            answerConfirmed = true; 
+
+            if (quizContainer) {
+                const inputs = quizContainer.querySelectorAll(`#q_card_${index} input[type="radio"]`);
+                inputs.forEach(input => input.disabled = true);
+            }
+
+            if (currentQuestionIndex < questions.length - 1) {
+                if(nextQuestionBtn) nextQuestionBtn.classList.remove('hidden');
+            } else {
+                showResults();
+            }
+        }
+
+        /**
+         * Manipula o clique no botão "Próxima Questão".
+         */
+        function handleNextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                displayQuestion(currentQuestionIndex);
+            }
+        }
+        
+        /**
+         * Exibe o resultado final do quiz.
+         */
+        function showResults() {
+            if (quizContainer) quizContainer.classList.add('hidden'); 
+            if (nextQuestionBtn) nextQuestionBtn.classList.add('hidden'); 
+            if (quizResultContainer) quizResultContainer.classList.remove('hidden');
+            
+            if (questions.length > 0) { 
+                 const calculatedPercentage = (score / questions.length) * 100;
+                 if (scoreElement) scoreElement.textContent = `Você acertou ${score} de ${questions.length} questões.`;
+                 if (percentageElement) percentageElement.textContent = `Seu aproveitamento: ${calculatedPercentage.toFixed(1)}%`;
+                 
+                 if (encouragementMessageElement) {
+                    if (calculatedPercentage >= 70) {
+                        encouragementMessageElement.textContent = "Excelente trabalho! Continue assim para a próxima sessão.";
+                    } else if (calculatedPercentage >= 50) {
+                        encouragementMessageElement.textContent = "Bom esforço! Reveja os pontos que errou e siga em frente.";
+                    } else {
+                        encouragementMessageElement.textContent = "Não desanime! A revisão é chave para o aprendizado. Tente novamente!";
+                    }
+                 }
+
+            } else {
+                if (scoreElement) scoreElement.textContent = "Nenhuma questão foi carregada.";
+                if (percentageElement) percentageElement.textContent = "Aproveitamento: N/A";
+                if (encouragementMessageElement) encouragementMessageElement.textContent = "Não há questões nesta sessão.";
+            }
+            
+            // Configura o link da próxima sessão
+            if (nextSessionLink) {
+                // Link para NC I - Sessão 3 (Sistemas Sensoriais e Plexos)
+                nextSessionLink.href = "nc_i_2bim_s3_sensorial_plexos.html";
+                nextSessionLink.textContent = "Próxima Sessão (Sistemas Sensoriais e Plexos)";
+            }
+
+
+            if (quizResultContainer) {
+                quizResultContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // Inicia o Quiz exibindo a primeira questão, se houver alguma.
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeQuizSession();
+        });
+        
+        function initializeQuizSession() {
+            quizContainer = document.getElementById('quiz-container');
+            nextQuestionBtn = document.getElementById('next-question-btn');
+            quizResultContainer = document.getElementById('quiz-result');
+            scoreElement = document.getElementById('score');
+            percentageElement = document.getElementById('percentage');
+            encouragementMessageElement = document.getElementById('encouragement-message');
+            nextSessionLink = document.getElementById('next-session-link'); 
+
+            currentQuestionIndex = 0;
+            score = 0;
+            answerConfirmed = false;
+
+            if (quizResultContainer) quizResultContainer.classList.add('hidden');
+            if (nextQuestionBtn) {
+                 nextQuestionBtn.classList.add('hidden');
+                 nextQuestionBtn.addEventListener('click', handleNextQuestion); // Adiciona listener aqui
+            }
+            if (quizContainer) quizContainer.classList.remove('hidden');
+
+            if (questions && questions.length > 0) {
+                displayQuestion(currentQuestionIndex);
+            } else {
+                if (quizContainer) {
+                    quizContainer.innerHTML = "<p class='text-center text-xl text-slate-700 mt-10'>Nenhuma questão disponível para esta sessão no momento.</p>";
+                }
+                showResults();
+            }
+        }
+    </script>
+
+</body>
+</html>

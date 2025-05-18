@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOI I Quiz – Cardio: Eletrofisiologia e Regulação</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .question-card {
+            scroll-margin-top: 80px; /* Offset for fixed header if any */
+        }
+        .feedback-correct {
+            background-color: #d1fae5; /* green-100 */
+            border-left: 4px solid #10b981; /* green-500 */
+            color: #065f46; /* green-800 */
+        }
+        .feedback-incorrect {
+            background-color: #fee2e2; /* red-100 */
+            border-left: 4px solid #ef4444; /* red-500 */
+            color: #991b1b; /* red-800 */
+        }
+        /* Custom radio/checkbox appearance */
+        .custom-radio:checked {
+            background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e");
+            background-color: #2563eb; /* blue-600 */
+            border-color: #2563eb; /* blue-600 */
+        }
+        .custom-radio {
+            appearance: none;
+            -webkit-appearance: none;
+            border-radius: 50%;
+            border-width: 2px;
+            border-style: solid;
+            border-color: #9ca3af; /* gray-400 */
+            width: 1.25em;
+            height: 1.25em;
+            margin-right: 0.5em;
+            position: relative;
+            top: 0.2em;
+        }
+        .true-false-option label {
+            display: flex;
+            align-items: center;
+            margin-right: 1rem;
+            cursor: pointer;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-slate-100 text-slate-900 flex flex-col min-h-screen">
+
+    <header class="bg-white shadow-md py-5 sm:py-6 sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6">
+            <h1 class="text-2xl sm:text-3xl font-bold text-blue-600 text-center">SOI I – Quiz: Eletrofisiologia Avançada e Regulação Cardiovascular</h1>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 sm:px-6 py-8">
+        <div class="mb-6">
+            <a href="soi_i_2bim_sessoes.html" class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors duration-300 text-base sm:text-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 sm:w-6 sm:h-6 mr-2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+                Voltar para Sessões de SOI I (2º Bim)
+            </a>
+        </div>
+
+        <div id="quiz-container">
+            </div>
+
+        <div id="navigation-buttons" class="mt-8 text-center">
+            <button id="next-question-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300 hidden">
+                Próxima Questão
+            </button>
+        </div>
+
+        <div id="quiz-result" class="hidden mt-10 bg-white p-6 sm:p-8 rounded-xl shadow-xl text-center">
+            <h2 class="text-2xl sm:text-3xl font-bold text-blue-600 mb-4">Resultado Final do Quiz</h2>
+            <p id="score" class="text-xl sm:text-2xl text-slate-700 mb-2"></p>
+            <p id="percentage" class="text-lg sm:text-xl text-slate-600 mb-4"></p>
+            <p id="encouragement-message" class="text-md text-slate-600 mb-6"></p>
+            <div class="mt-6 space-y-4 sm:space-y-0 sm:flex sm:flex-wrap sm:justify-center sm:gap-4">
+                <button onclick="window.location.reload()" class="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300">
+                    Tentar Novamente
+                </button>
+                <a href="soi_i_2bim_s2_vascular_linfatico.html" id="next-session-link" class="w-full sm:w-auto inline-block bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300">
+                    Próxima Sessão (Vascularização e Linfático)
+                </a>
+                <a href="soi_i_2bim_sessoes.html" class="w-full sm:w-auto inline-block bg-slate-500 hover:bg-slate-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300">
+                    Retornar à Seleção de Sessões (SOI I)
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-slate-200 border-t border-slate-300 py-5 sm:py-6 mt-auto">
+        <div class="container mx-auto px-4 sm:px-6 text-center">
+            <p class="text-sm text-slate-600">© <span id="currentYear"></span> – Quiz para Estudos Médicos. Foco: 2º Bimestre.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Define o ano atual no rodapé
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        const questions = [
+            // Questão 1
+            {
+                caseClinical: "Paciente J.C.M., 62 anos, hipertenso crônico com má adesão ao tratamento, comparece ao ambulatório para avaliação de rotina. Nega sintomas atuais. Ao exame físico: PA 165/100 mmHg, FC 78 bpm, IMC 31 kg/m². Foi realizado um ECG de 12 derivações.",
+                image: { src: "https://geekymedics.com/wp-content/uploads/2011/03/normal_12_lead_ecg.jpg", alt: "ECG de 12 derivações do paciente (referência normal).", caption: "Nota: Este é um ECG normal para referência. A questão discute HVE, que apresentaria alterações específicas." },
+                statement: "Considerando a hipertensão arterial sistêmica (HAS) como uma condição que impõe sobrecarga crônica de pressão ao ventrículo esquerdo (VE), qual das seguintes alterações eletrocardiográficas é um achado comum e precoce sugestivo de hipertrofia ventricular esquerda (HVE) decorrente da HAS, e qual o principal mecanismo fisiopatológico que a origina?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Diminuição da amplitude do complexo QRS nas derivações precordiais e desvio do eixo elétrico para a direita; devido à dilatação adaptativa do VE.", value: "a" },
+                    { text: "Aumento da duração do intervalo PR e presença de ondas U proeminentes; devido ao retardo na condução atrioventricular causado pela fibrose.", value: "b" },
+                    { text: "Aumento da amplitude do complexo QRS (ex: índice de Sokolow-Lyon positivo) e/ou alterações da repolarização ventricular (ex: infradesnivelamento de ST e inversão de onda T \"strain pattern\"); devido ao aumento da massa miocárdica do VE em resposta à pós-carga elevada.", value: "c" },
+                    { text: "Presença de bloqueio de ramo direito completo e ondas Q patológicas em derivações inferiores; devido à isquemia septal induzida pela HAS.", value: "d" },
+                    { text: "Alargamento da onda P (P mitrale) e fibrilação atrial; devido à sobrecarga de volume no átrio esquerdo secundária à disfunção diastólica do VE.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "A HAS eleva a pós-carga do VE, levando à hipertrofia compensatória (aumento da massa muscular). Eletrocardiograficamente, isso se manifesta frequentemente pelo aumento da voltagem dos complexos QRS (critérios como Sokolow-Lyon: S V1 + R V5 ou V6 > 35mm) e, com a progressão, podem surgir alterações de repolarização (infradesnível de ST e inversão de T, conhecidas como \"strain\") nas derivações que refletem o VE."
+            },
+            // Questão 2
+            {
+                caseClinical: "Um estudante de medicina está aprendendo a calcular o eixo elétrico do QRS no plano frontal utilizando o sistema hexaxial e as derivações periféricas de um ECG de 12 derivações. Ele observa um traçado onde a derivação DI é predominantemente positiva e a derivação aVF é também predominantemente positiva.",
+                image: { src: "https://cdn.prod.website-files.com/66d0e7a96b98d86958f6379c/66d0e7a96b98d86958f63df4_eletrodos2.png", alt: "Colocação dos eletrodos do ECG para derivações periféricas.", caption: "Imagem ilustrando a colocação dos eletrodos periféricos. Para o cálculo do eixo, considere também o sistema hexaxial (DI: 0°, aVF: +90°)." },
+                statement: "Considerando que a derivação DI é positiva e a derivação aVF é positiva em um ECG, qual é a localização mais provável do eixo elétrico do QRS no plano frontal, e o que isso geralmente significa em um adulto?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Eixo desviado para a esquerda (entre -30° e -90°); sugestivo de bloqueio divisional anterossuperior esquerdo.", value: "a" },
+                    { text: "Eixo normal (entre 0° e +90°); geralmente indica uma orientação elétrica normal do coração.", value: "b" },
+                    { text: "Eixo desviado para a direita (entre +90° e +180°); sugestivo de sobrecarga ventricular direita.", value: "c" },
+                    { text: "Eixo indeterminado ou extremo (entre -90° e -180° ou +180° e +270°); frequentemente associado a erros de colocação de eletrodos ou condições raras.", value: "d" },
+                    { text: "Eixo normal (entre +90° e +120°); comum em indivíduos longilíneos e atletas.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "No sistema hexaxial, DI positivo significa que o vetor resultante da despolarização ventricular aponta para o lado esquerdo do paciente (0°). aVF positivo significa que o vetor aponta para baixo (+90°). Quando ambos DI e aVF são positivos, o eixo elétrico resultante estará no quadrante inferior esquerdo do sistema hexaxial, que corresponde ao intervalo de 0° a +90°. Esta faixa é considerada normal para o eixo elétrico do QRS em adultos."
+            },
+            // Questão 3
+            {
+                caseClinical: "Paciente A.F.G., 75 anos, é trazido ao serviço de emergência com queixa de dor torácica opressiva iniciada há 2 horas, com irradiação para o braço esquerdo, acompanhada de sudorese e náuseas. O ECG de 12 derivações realizado na admissão evidencia supradesnivelamento do segmento ST de 3 mm nas derivações V2, V3 e V4.",
+                image: { src: "https://placehold.co/600x300/e2e8f0/64748b?text=ECG+com+IAM+(V2-V4)", alt: "ECG de 12 derivações com sinais de Infarto Agudo do Miocárdio.", caption: "Imagem ilustrativa de ECG com supradesnivelamento de ST em V2-V4, sugestivo de IAM de parede anterior." },
+                statement: "Considerando o quadro clínico e os achados eletrocardiográficos do Sr. A.F.G., que são altamente sugestivos de um Infarto Agudo do Miocárdio com Supradesnivelamento do Segmento ST (IAMCSST), analise as seguintes asserções:\nI. O supradesnivelamento do segmento ST nas derivações precordiais V2 a V4 indica uma corrente de lesão transmural aguda na parede anterior do ventrículo esquerdo, frequentemente causada pela oclusão da artéria descendente anterior.\nPORQUE\nII. A artéria descendente anterior (DA) é responsável pela irrigação da maior parte da parede anterior do ventrículo esquerdo, do ápex cardíaco e dos dois terços anteriores do septo interventricular, e sua oclusão leva à necrose progressiva dessas áreas se o fluxo sanguíneo não for restabelecido rapidamente.",
+                type: "assertion-reason",
+                options: [
+                    { text: "As asserções I e II são proposições verdadeiras, e a II é uma justificativa correta da I.", value: "a" },
+                    { text: "As asserções I e II são proposições verdadeiras, mas a II não é uma justificativa correta da I.", value: "b" },
+                    { text: "A asserção I é uma proposição verdadeira, e a II é uma proposição falsa.", value: "c" },
+                    { text: "A asserção I é uma proposição falsa, e a II é uma proposição verdadeira.", value: "d" },
+                    { text: "As asserções I e II são proposições falsas.", value: "e" }
+                ],
+                correctAnswer: "a",
+                justification: "A asserção I descreve corretamente a interpretação do supradesnivelamento do ST em V2-V4 como lesão transmural na parede anterior e sua associação com a oclusão da DA. A asserção II descreve corretamente o território de irrigação da artéria DA. A oclusão da DA causa a isquemia e lesão no território descrito, que se manifesta como o supradesnivelamento do ST. Portanto, II é uma justificativa correta para I."
+            },
+            // Questão 4
+            {
+                caseClinical: "Um indivíduo sofre uma queda súbita da pressão arterial devido a uma hemorragia aguda. Seus barorreceptores arteriais, localizados no seio carotídeo e no arco aórtico, detectam essa alteração hemodinâmica.",
+                image: { src: "https://placehold.co/600x300/e2e8f0/64748b?text=Barorreceptores+Arteriais", alt: "Esquema dos barorreceptores arteriais.", caption: "Ilustração conceitual da localização dos barorreceptores no seio carotídeo e arco aórtico." },
+                statement: "Qual é a resposta reflexa imediata mediada pelo sistema nervoso autônomo, desencadeada pela diminuição do estiramento dos barorreceptores arteriais devido à queda da pressão arterial no cenário de hemorragia aguda?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Aumento da atividade parassimpática (vagal) e diminuição da atividade simpática, resultando em bradicardia e vasodilatação periférica.", value: "a" },
+                    { text: "Diminuição da atividade parassimpática e aumento da atividade simpática, resultando em taquicardia, aumento da contratilidade miocárdica e vasoconstrição arteriolar periférica.", value: "b" },
+                    { text: "Liberação aumentada de peptídeo natriurético atrial (ANP), causando natriurese e diurese para reduzir ainda mais a volemia.", value: "c" },
+                    { text: "Estimulação direta dos quimiorreceptores periféricos, levando a uma hiperventilação primária sem alterações cardiovasculares significativas.", value: "d" },
+                    { text: "Inibição do sistema renina-angiotensina-aldosterona, diminuindo a retenção de sódio e água.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "A queda da PA reduz o estiramento dos barorreceptores, diminuindo seus disparos aferentes. Isso resulta em redução reflexa da atividade parassimpática e aumento da atividade simpática, levando a taquicardia, aumento da contratilidade e vasoconstrição para restaurar a PA."
+            },
+            // Questão 5
+            {
+                caseClinical: "Uma paciente com insuficiência cardíaca crônica (ICC) apresenta sinais de congestão sistêmica, como edema de membros inferiores e hepatomegalia. Ela está em uso de diuréticos e um vasodilatador. O médico explica que, na ICC, vários sistemas neuro-hormonais são ativados cronicamente.",
+                statement: "Na fisiopatologia da insuficiência cardíaca crônica, a ativação persistente do Sistema Renina-Angiotensina-Aldosterona (SRAA) contribui para a progressão da doença. Julgue as seguintes afirmações sobre os efeitos da Angiotensina II e da Aldosterona neste contexto como Verdadeiras (V) ou Falsas (F):",
+                type: "true-false",
+                statements: [
+                    { id: "q5_1", text: "I. A Angiotensina II promove vasoconstrição arteriolar periférica, aumentando a pós-carga ventricular, e estimula a sede e a liberação de ADH, contribuindo para a retenção hídrica." },
+                    { id: "q5_2", text: "II. A Aldosterona, liberada pela glândula adrenal, atua nos túbulos renais promovendo a reabsorção de sódio e água e a excreção de potássio, piorando a congestão." },
+                    { id: "q5_3", text: "III. A ativação crônica do SRAA induz efeitos benéficos de remodelamento cardíaco, como a redução da fibrose miocárdica." },
+                    { id: "q5_4", text: "IV. Fármacos como IECA e BRA antagonizam os efeitos do SRAA e são pilares no tratamento da ICC com fração de ejeção reduzida." }
+                ],
+                correctAnswer: ["V", "V", "F", "V"], // V, V, F, V
+                justification: "I. Verdadeira. São efeitos da Angiotensina II. II. Verdadeira. A aldosterona contribui para retenção de volume. III. Falsa. O SRAA crônico causa remodelamento deletério (fibrose, hipertrofia). IV. Verdadeira. IECAs/BRAs antagonizam o SRAA, melhorando o prognóstico na ICCFER."
+            },
+            // Questão 6
+            {
+                caseClinical: "Um paciente com estenose da artéria renal bilateral desenvolve hipertensão arterial grave e de difícil controle. Exames complementares mostram níveis elevados de renina plasmática.",
+                image: { src: "https://placehold.co/600x300/e2e8f0/64748b?text=Aparelho+Justaglomerular", alt: "Esquema do aparelho justaglomerular.", caption: "Ilustração conceitual do aparelho justaglomerular e estímulos para liberação de renina." },
+                statement: "A estenose da artéria renal leva à hipoperfusão do rim afetado. Qual é o principal mecanismo pelo qual essa hipoperfusão renal estimula a liberação de renina pelas células justaglomerulares, desencadeando a cascata do sistema renina-angiotensina-aldosterona e contribuindo para a hipertensão renovascular?",
+                type: "multiple-choice",
+                options: [
+                    { text: "O aumento da pressão de perfusão nas arteríolas aferentes estimula diretamente as células justaglomerulares a secretar renina.", value: "a" },
+                    { text: "A redução do fluxo sanguíneo para a mácula densa causa uma diminuição na entrega de NaCl a essa estrutura, que por sua vez sinaliza para as células justaglomerulares aumentarem a secreção de renina.", value: "b" },
+                    { text: "A estimulação direta do nervo vago (parassimpático) sobre as células justaglomerulares em resposta à isquemia renal.", value: "c" },
+                    { text: "A elevação dos níveis de potássio sérico, detectada pelas células da mácula densa, inibe a liberação de renina.", value: "d" },
+                    { text: "A liberação aumentada de peptídeo natriurético atrial (ANP) pelos átrios cardíacos em resposta à hipoperfusão renal.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "A hipoperfusão renal (ex: estenose da artéria renal) reduz a entrega de NaCl à mácula densa. Isso estimula as células da mácula densa a sinalizar para as células justaglomerulares adjacentes para aumentar a secreção de renina. Outros mecanismos incluem o barorreceptor intrarrenal e a estimulação simpática (beta-1)."
+            },
+            // Questão 7
+            {
+                caseClinical: "Um paciente está em choque séptico, apresentando hipotensão arterial profunda (PA 70/40 mmHg) apesar da reposição volêmica inicial. Ele desenvolve taquicardia (FC 130 bpm), pele fria e pegajosa, e oligúria. Os médicos optam por iniciar uma amina vasoativa para aumentar a pressão arterial.",
+                statement: "No choque séptico, ocorre uma vasodilatação periférica patológica. Para reverter a hipotensão, são frequentemente utilizadas drogas com ação predominantemente alfa-1 adrenérgica. Qual o principal efeito cardiovascular da estimulação dos receptores alfa-1 adrenérgicos localizados na musculatura lisa vascular?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Vasodilatação arteriolar e venular, reduzindo a resistência vascular periférica e a pressão arterial.", value: "a" },
+                    { text: "Aumento da frequência cardíaca e da força de contração miocárdica.", value: "b" },
+                    { text: "Vasoconstrição arteriolar e venular, aumentando a resistência vascular periférica e, consequentemente, a pressão arterial.", value: "c" },
+                    { text: "Broncodilatação e relaxamento da musculatura lisa uterina.", value: "d" },
+                    { text: "Inibição da liberação de noradrenalina das terminações nervosas simpáticas.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "A estimulação de receptores alfa-1 adrenérgicos na musculatura lisa vascular causa vasoconstrição arteriolar (aumentando RVP e PA) e venoconstrição (aumentando retorno venoso). Efeitos crono/inotrópicos são beta-1. Broncodilatação é beta-2. Inibição da liberação de NA é alfa-2 pré-sináptico."
+            },
+            // Questão 8
+            {
+                caseClinical: "Uma atleta de maratona, durante um treino intenso em clima quente e úmido, perde grande quantidade de fluido através da sudorese. Se não houver reposição hídrica adequada, ela pode desenvolver desidratação e hipovolemia.",
+                statement: "Em resposta à hipovolemia e à tendência à queda da pressão arterial causada pela desidratação, qual dos seguintes hormônios tem sua secreção AUMENTADA e qual seu principal mecanismo de ação para auxiliar na restauração do volume intravascular e da pressão arterial?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Peptídeo Natriurético Atrial (ANP); promove excreção de sódio e água pelos rins.", value: "a" },
+                    { text: "Hormônio Antidiurético (ADH ou Vasopressina); aumenta a reabsorção de água livre nos túbulos coletores renais e, em altas concentrações, causa vasoconstrição.", value: "b" },
+                    { text: "Insulina; promove a captação de glicose pelas células e diminui a osmolaridade plasmática.", value: "c" },
+                    { text: "Paratormônio (PTH); aumenta a reabsorção de cálcio nos rins e ossos.", value: "d" },
+                    { text: "Gastrina; estimula a secreção de ácido gástrico.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "Hipovolemia e aumento da osmolaridade estimulam a liberação de ADH. O ADH aumenta a reabsorção de água nos túbulos coletores renais, conservando volume. Em altas concentrações, causa vasoconstrição. ANP tem efeito oposto."
+            },
+            // Questão 9
+            {
+                caseClinical: "Um paciente apresenta-se com edema generalizado (anasarca), ascite e dispneia. A investigação diagnóstica aponta para síndrome nefrótica, uma condição caracterizada por proteinúria maciça.",
+                statement: "Considerando as forças de Starling que governam a movimentação de fluidos através da parede capilar, qual é o principal mecanismo pelo qual a hipoalbuminemia secundária à síndrome nefrótica contribui para a formação do edema generalizado?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Aumento da pressão hidrostática capilar devido à insuficiência cardíaca.", value: "a" },
+                    { text: "Diminuição da pressão oncótica (coloidosmótica) do plasma, reduzindo a força que retém fluido dentro dos capilares.", value: "b" },
+                    { text: "Aumento da permeabilidade da membrana capilar a proteínas.", value: "c" },
+                    { text: "Obstrução da drenagem linfática.", value: "d" },
+                    { text: "Diminuição da pressão hidrostática intersticial.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "A albumina é a principal proteína responsável pela pressão oncótica plasmática. Na síndrome nefrótica, a perda urinária de albumina leva à hipoalbuminemia, reduzindo a pressão oncótica do plasma. Isso diminui a força que retém fluido nos capilares, favorecendo o extravasamento para o interstício e causando edema."
+            },
+            // Questão 10
+            {
+                caseClinical: "Durante uma cirurgia cardíaca, para proteger o miocárdio da isquemia, é induzida cardioplegia através da infusão de uma solução rica em potássio na circulação coronariana. Essa solução causa parada cardíaca em diástole.",
+                statement: "Qual é o mecanismo eletrofisiológico pelo qual uma alta concentração extracelular de potássio, como na solução cardioplégica, induz parada cardíaca em diástole?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Bloqueio dos canais de sódio rápidos, impedindo a fase 0 do potencial de ação.", value: "a" },
+                    { text: "Aumento acentuado da corrente de cálcio tipo L, levando a uma contração sustentada.", value: "b" },
+                    { text: "Redução do gradiente de potássio transmembrana, tornando o potencial de repouso menos negativo (despolarização parcial), o que inativa os canais de sódio e impede novos potenciais de ação.", value: "c" },
+                    { text: "Estimulação excessiva dos receptores beta-1 adrenérgicos.", value: "d" },
+                    { text: "Inibição da bomba de Na+/K+-ATPase, hiperpolarizando a célula.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "Alta [K+] extracelular reduz o gradiente de efluxo de K+, tornando o potencial de repouso menos negativo (despolarização). Se a membrana fica despolarizada acima do limiar de inativação dos canais de Na+ rápidos (ex: -50 a -60 mV), eles não podem ser reabertos, impedindo novos potenciais de ação e causando parada em diástole."
+            }
+        ];
+
+        // Variáveis globais do quiz
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answerConfirmed = false; 
+
+        // Elementos do DOM (serão obtidos na inicialização)
+        let quizContainer;
+        let nextQuestionBtn;
+        let quizResultContainer;
+        let scoreElement;
+        let percentageElement;
+        let encouragementMessageElement;
+        let nextSessionLink; 
+
+        /**
+         * Exibe a questão atual na tela.
+         * @param {number} index - O índice da questão a ser exibida.
+         */
+        function displayQuestion(index) {
+            answerConfirmed = false; 
+            const q = questions[index];
+            let optionsHtml = '';
+
+            if (!q) { 
+                console.error("Questão não encontrada no índice:", index);
+                if (questions.length > 0) { 
+                     showResults();
+                } else { 
+                    if(quizContainer) quizContainer.innerHTML = "<p class='text-center text-red-500'>Nenhuma questão carregada para este quiz.</p>";
+                }
+                return;
+            }
+
+            if (q.type === "multiple-choice" || q.type === "assertion-reason") {
+                q.options.forEach(option => {
+                    optionsHtml += `
+                        <label class="block bg-slate-50 hover:bg-sky-100 p-4 rounded-lg border border-slate-200 mb-3 cursor-pointer transition-colors duration-200">
+                            <input type="radio" name="question${index}" value="${option.value}" class="custom-radio">
+                            <span class="text-slate-700">${option.text}</span>
+                        </label>
+                    `;
+                });
+            } else if (q.type === "true-false") { // Adicionado para tratar questões V/F
+                q.statements.forEach((stmt, i) => {
+                    optionsHtml += `
+                        <div class="mb-3 p-3 border border-slate-200 rounded-lg bg-slate-50">
+                            <p class="text-slate-700 mb-2">${stmt.text}</p>
+                            <div class="flex">
+                                <div class="true-false-option">
+                                    <input type="radio" id="${stmt.id}_v" name="q${index}_stmt${i}" value="V" class="custom-radio">
+                                    <label for="${stmt.id}_v" class="ml-1 text-slate-700">Verdadeiro</label>
+                                </div>
+                                <div class="true-false-option ml-4">
+                                    <input type="radio" id="${stmt.id}_f" name="q${index}_stmt${i}" value="F" class="custom-radio">
+                                    <label for="${stmt.id}_f" class="ml-1 text-slate-700">Falso</label>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            if(quizContainer) { 
+                quizContainer.innerHTML = `
+                    <div class="question-card bg-white p-6 sm:p-8 rounded-xl shadow-xl" id="q_card_${index}">
+                        <p class="text-sm text-slate-500 mb-1">Questão ${index + 1} de ${questions.length}</p>
+                        ${q.caseClinical ? `<div class="mb-4 p-4 bg-sky-50 rounded-md text-slate-700 text-sm sm:text-base italic">${q.caseClinical}</div>` : ''}
+                        ${q.image ? `
+                            <div class="my-4 text-center">
+                                <img src="${q.image.src}" alt="${q.image.alt}" class="max-w-full h-auto mx-auto rounded-lg shadow-sm border border-slate-200" onerror="this.onerror=null; this.src='https://placehold.co/600x300/e2e8f0/64748b?text=Imagem+Indisponível'; this.alt='Imagem indisponível';">
+                                ${q.image.caption ? `<p class="text-xs text-slate-500 mt-2">${q.image.caption}</p>` : ''}
+                            </div>` : ''}
+                        <p class="font-semibold text-slate-800 mb-5 text-base sm:text-lg whitespace-pre-line">${q.statement}</p>
+                        <div class="options-container">${optionsHtml}</div>
+                        <button onclick="confirmAnswer(${index})" class="confirm-btn mt-6 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md transition-colors duration-300">
+                            Confirmar Resposta
+                        </button>
+                        <div class="feedback-area mt-4 p-4 rounded-md hidden text-sm sm:text-base"></div>
+                    </div>
+                `;
+            }
+            if(nextQuestionBtn) nextQuestionBtn.classList.add('hidden'); 
+            
+            const cardElement = document.getElementById(`q_card_${index}`);
+            if (cardElement) {
+                 cardElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        /**
+         * Confirma a resposta do usuário, calcula a pontuação e exibe o feedback.
+         * @param {number} index - O índice da questão atual.
+         */
+        function confirmAnswer(index) {
+            if (answerConfirmed) return; 
+
+            const q = questions[index];
+            if (!q) { 
+                console.error("Tentativa de confirmar resposta para questão inexistente:", index);
+                return;
+            }
+            const feedbackDiv = quizContainer ? quizContainer.querySelector(`#q_card_${index} .feedback-area`) : null;
+            const confirmBtn = quizContainer ? quizContainer.querySelector(`#q_card_${index} .confirm-btn`) : null;
+            let isCorrect = false;
+            
+            if (q.type === "multiple-choice" || q.type === "assertion-reason") {
+                const selectedOption = quizContainer ? quizContainer.querySelector(`input[name="question${index}"]:checked`) : null;
+                if (!selectedOption) { 
+                    if (feedbackDiv) {
+                        feedbackDiv.innerHTML = '<p class="font-semibold">Por favor, selecione uma alternativa.</p>';
+                        feedbackDiv.className = 'feedback-area mt-4 p-4 rounded-md bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700';
+                        feedbackDiv.classList.remove('hidden');
+                    }
+                    return;
+                }
+                isCorrect = selectedOption.value === q.correctAnswer;
+            } else if (q.type === "true-false") { // Adicionado para tratar questões V/F
+                const userAnswers = [];
+                let allSubQuestionsAnswered = true;
+                q.statements.forEach((_, i) => {
+                    const choice = quizContainer ? quizContainer.querySelector(`input[name="q${index}_stmt${i}"]:checked`) : null;
+                    if (choice) {
+                        userAnswers.push(choice.value);
+                    } else {
+                        allSubQuestionsAnswered = false;
+                    }
+                });
+
+                if (!allSubQuestionsAnswered) {
+                    if (feedbackDiv) {
+                        feedbackDiv.innerHTML = '<p class="font-semibold">Por favor, responda todas as afirmações (V ou F).</p>';
+                        feedbackDiv.className = 'feedback-area mt-4 p-4 rounded-md bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700';
+                        feedbackDiv.classList.remove('hidden');
+                    }
+                    return;
+                }
+                isCorrect = JSON.stringify(userAnswers) === JSON.stringify(q.correctAnswer);
+            }
+            
+            if (feedbackDiv) { 
+                if (isCorrect) {
+                    score++;
+                    feedbackDiv.innerHTML = `<p class="font-semibold mb-1">Resposta Correta!</p><p>${q.justification}</p>`;
+                    feedbackDiv.className = 'feedback-area mt-4 p-4 rounded-md feedback-correct';
+                } else {
+                    feedbackDiv.innerHTML = `<p class="font-semibold mb-1">Resposta Incorreta.</p><p><strong>Justificativa:</strong> ${q.justification}</p>`;
+                    feedbackDiv.className = 'feedback-area mt-4 p-4 rounded-md feedback-incorrect';
+                }
+                feedbackDiv.classList.remove('hidden');
+            }
+
+            if (confirmBtn) { 
+                confirmBtn.disabled = true; 
+                confirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+            answerConfirmed = true; 
+
+            if (quizContainer) {
+                const inputs = quizContainer.querySelectorAll(`#q_card_${index} input[type="radio"]`);
+                inputs.forEach(input => input.disabled = true);
+            }
+
+            if (currentQuestionIndex < questions.length - 1) {
+                if(nextQuestionBtn) nextQuestionBtn.classList.remove('hidden');
+            } else {
+                showResults();
+            }
+        }
+
+        /**
+         * Manipula o clique no botão "Próxima Questão".
+         */
+        function handleNextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                displayQuestion(currentQuestionIndex);
+            }
+        }
+        
+        /**
+         * Exibe o resultado final do quiz.
+         */
+        function showResults() {
+            if (quizContainer) quizContainer.classList.add('hidden'); 
+            if (nextQuestionBtn) nextQuestionBtn.classList.add('hidden'); 
+            if (quizResultContainer) quizResultContainer.classList.remove('hidden');
+            
+            if (questions.length > 0) { 
+                 const calculatedPercentage = (score / questions.length) * 100;
+                 if (scoreElement) scoreElement.textContent = `Você acertou ${score} de ${questions.length} questões.`;
+                 if (percentageElement) percentageElement.textContent = `Seu aproveitamento: ${calculatedPercentage.toFixed(1)}%`;
+                 
+                 if (encouragementMessageElement) {
+                    if (calculatedPercentage >= 70) {
+                        encouragementMessageElement.textContent = "Excelente trabalho! Continue assim para a próxima sessão.";
+                    } else if (calculatedPercentage >= 50) {
+                        encouragementMessageElement.textContent = "Bom esforço! Reveja os pontos que errou e siga em frente.";
+                    } else {
+                        encouragementMessageElement.textContent = "Não desanime! A revisão é chave para o aprendizado. Tente novamente!";
+                    }
+                 }
+
+            } else {
+                if (scoreElement) scoreElement.textContent = "Nenhuma questão foi carregada.";
+                if (percentageElement) percentageElement.textContent = "Aproveitamento: N/A";
+                if (encouragementMessageElement) encouragementMessageElement.textContent = "Não há questões nesta sessão.";
+            }
+            
+            // Configura o link da próxima sessão
+            if (nextSessionLink) {
+                 // Link para SOI I - Sessão 3 (Respiratório: Estrutura e Mecânica)
+                nextSessionLink.href = "soi_i_2bim_s3_resp_mecanica.html";
+                nextSessionLink.textContent = "Próxima Sessão (Respiratório: Estrutura e Mecânica)";
+            }
+
+
+            if (quizResultContainer) {
+                quizResultContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // Inicia o Quiz exibindo a primeira questão, se houver alguma.
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeQuizSession();
+        });
+
+        function initializeQuizSession() {
+            quizContainer = document.getElementById('quiz-container');
+            nextQuestionBtn = document.getElementById('next-question-btn');
+            quizResultContainer = document.getElementById('quiz-result');
+            scoreElement = document.getElementById('score');
+            percentageElement = document.getElementById('percentage');
+            encouragementMessageElement = document.getElementById('encouragement-message');
+            nextSessionLink = document.getElementById('next-session-link'); 
+
+            currentQuestionIndex = 0;
+            score = 0;
+            answerConfirmed = false;
+
+            if (quizResultContainer) quizResultContainer.classList.add('hidden');
+            if (nextQuestionBtn) {
+                 nextQuestionBtn.classList.add('hidden');
+                 nextQuestionBtn.addEventListener('click', handleNextQuestion); // Adiciona listener aqui
+            }
+            if (quizContainer) quizContainer.classList.remove('hidden');
+
+            if (questions && questions.length > 0) {
+                displayQuestion(currentQuestionIndex);
+            } else {
+                if (quizContainer) {
+                    quizContainer.innerHTML = "<p class='text-center text-xl text-slate-700 mt-10'>Nenhuma questão disponível para esta sessão no momento.</p>";
+                }
+                showResults();
+            }
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOI I Quiz – Cardio: Vascularização e Linfático</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .question-card {
+            scroll-margin-top: 80px; /* Offset para cabeçalho fixo, se houver */
+        }
+        .feedback-correct {
+            background-color: #d1fae5; /* Tailwind green-100 */
+            border-left: 4px solid #10b981; /* Tailwind green-500 */
+            color: #065f46; /* Tailwind green-800 */
+        }
+        .feedback-incorrect {
+            background-color: #fee2e2; /* Tailwind red-100 */
+            border-left: 4px solid #ef4444; /* Tailwind red-500 */
+            color: #991b1b; /* Tailwind red-800 */
+        }
+        /* Aparência personalizada do botão de rádio */
+        .custom-radio:checked {
+            background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e");
+            background-color: #2563eb; /* Tailwind blue-600 */
+            border-color: #2563eb; /* Tailwind blue-600 */
+        }
+        .custom-radio {
+            appearance: none;
+            -webkit-appearance: none;
+            border-radius: 50%;
+            border-width: 2px;
+            border-style: solid;
+            border-color: #9ca3af; /* Tailwind gray-400 */
+            width: 1.25em;
+            height: 1.25em;
+            margin-right: 0.5em;
+            position: relative;
+            top: 0.2em;
+        }
+        .true-false-option label { /* Estilo para opções V/F, se usado */
+            display: flex;
+            align-items: center;
+            margin-right: 1rem;
+            cursor: pointer;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-slate-100 text-slate-900 flex flex-col min-h-screen">
+
+    <header class="bg-white shadow-md py-5 sm:py-6 sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6">
+            <h1 class="text-2xl sm:text-3xl font-bold text-blue-600 text-center">SOI I – Quiz: Vascularização Cardiovascular e Sistema Linfático</h1>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 sm:px-6 py-8">
+        <div class="mb-6">
+            <a href="soi_i_2bim_sessoes.html" class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors duration-300 text-base sm:text-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 sm:w-6 sm:h-6 mr-2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+                Voltar para Sessões de SOI I (2º Bim)
+            </a>
+        </div>
+
+        <div id="quiz-container">
+            </div>
+
+        <div id="navigation-buttons" class="mt-8 text-center">
+            <button id="next-question-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300 hidden">
+                Próxima Questão
+            </button>
+        </div>
+
+        <div id="quiz-result" class="hidden mt-10 bg-white p-6 sm:p-8 rounded-xl shadow-xl text-center">
+            <h2 class="text-2xl sm:text-3xl font-bold text-blue-600 mb-4">Resultado Final do Quiz</h2>
+            <p id="score" class="text-xl sm:text-2xl text-slate-700 mb-2"></p>
+            <p id="percentage" class="text-lg sm:text-xl text-slate-600 mb-4"></p>
+            <p id="encouragement-message" class="text-md text-slate-600 mb-6"></p>
+            <div class="mt-6 space-y-4 sm:space-y-0 sm:flex sm:flex-wrap sm:justify-center sm:gap-4">
+                <button onclick="window.location.reload()" class="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300">
+                    Tentar Novamente
+                </button>
+                <a href="soi_i_2bim_s3_resp_mecanica.html" id="next-session-link" class="w-full sm:w-auto inline-block bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300">
+                    Próxima Sessão (Respiratório: Estrutura e Mecânica)
+                </a>
+                <a href="soi_i_2bim_sessoes.html" class="w-full sm:w-auto inline-block bg-slate-500 hover:bg-slate-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300">
+                    Retornar à Seleção de Sessões (SOI I)
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-slate-200 border-t border-slate-300 py-5 sm:py-6 mt-auto">
+        <div class="container mx-auto px-4 sm:px-6 text-center">
+            <p class="text-sm text-slate-600">© <span id="currentYear"></span> – Quiz para Estudos Médicos. Foco: 2º Bimestre.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Define o ano atual no rodapé
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Array de questões para a Sessão 2 de SOI I
+        const questions = [
+            // Questão 1
+            {
+                caseClinical: "Paciente de 68 anos, com histórico de diabetes mellitus e dislipidemia, é diagnosticado com doença arterial coronariana multiarterial. Durante o planejamento de uma cirurgia de revascularização do miocárdio (\"ponte de safena\"), o cirurgião discute os possíveis enxertos a serem utilizados, mencionando a artéria torácica interna esquerda e segmentos da veia safena magna.",
+                image: { src: "https://www.misodor.com.br/sdgrtrthujyuj.gif", alt: "Vascularização coronariana e seus ramos.", caption: "Representação esquemática da vascularização coronariana." },
+                statement: "A artéria coronária direita (ACD), em um padrão de dominância direita (o mais comum), origina qual importante ramo arterial responsável pela irrigação da parede inferior do ventrículo esquerdo e do terço posterior do septo interventricular, além de suprir frequentemente o nó atrioventricular?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Ramo interventricular anterior (Descendente Anterior).", value: "a" },
+                    { text: "Ramo circunflexo.", value: "b" },
+                    { text: "Ramo descendente posterior (Interventricular Posterior).", value: "c" },
+                    { text: "Ramo marginal agudo (ou direito).", value: "d" },
+                    { text: "Artéria do nó sinoatrial.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "Em corações com dominância direita (cerca de 70-85% dos casos), o ramo descendente posterior (RDP), que irriga a parede inferior do VE e o terço posterior do septo, origina-se da artéria coronária direita. A ACD também costuma dar origem ao ramo do nó AV. O ramo interventricular anterior e o circunflexo são ramos da coronária esquerda."
+            },
+            // Questão 2
+            {
+                caseClinical: "Um recém-nascido apresenta cianose persistente e sopro cardíaco. A investigação diagnóstica revela uma cardiopatia congênita complexa denominada Transposição das Grandes Artérias (TGA), na qual a aorta emerge do ventrículo direito e o tronco pulmonar emerge do ventrículo esquerdo, criando duas circulações paralelas e inviáveis sem comunicações entre elas.",
+                image: { src: "https://www.fpcardiologia.pt/wp-content/uploads/2013/09/ATLAS-DO-CORA%C3%87%C3%83O.gif", alt: "Diagrama da grande e pequena circulação normais.", caption: "Esquemas da grande e pequena circulação (normal)." },
+                statement: "No sistema circulatório normal (representado na Imagem 2), o sangue ejetado pelo ventrículo esquerdo para a grande circulação retorna para qual câmara cardíaca, e através de quais grandes vasos?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Átrio esquerdo, através das veias pulmonares.", value: "a" },
+                    { text: "Ventrículo direito, através do tronco pulmonar.", value: "b" },
+                    { text: "Átrio direito, através das veias cavas superior e inferior.", value: "c" },
+                    { text: "Ventrículo esquerdo, através das artérias coronárias.", value: "d" },
+                    { text: "Átrio direito, através do seio coronário.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "Na grande circulação (sistêmica), o sangue oxigenado é ejetado pelo ventrículo esquerdo para a aorta e distribuído para o corpo. Após as trocas gasosas nos tecidos, o sangue desoxigenado retorna ao átrio direito através das veias cavas superior e inferior."
+            },
+            // Questão 3
+            {
+                caseClinical: "Paciente masculino, 70 anos, com histórico de tabagismo pesado, queixa-se de dor abdominal pulsátil e foi diagnosticado com um aneurisma da aorta abdominal infrarrenal, com diâmetro de 6 cm, conforme visualizado em exame de imagem.",
+                image: { src: "https://www.researchgate.net/profile/Edson-Marchiori/publication/250037118/figure/fig1/AS:670703347052562@1536919547899/Figura-1-Aneurisma-da-aorta-abdominal-infra-renal-que-nao-envolve-as-arterias-renais.png", alt: "Aneurisma da aorta abdominal.", caption: "Imagem de um aneurisma aórtico abdominal." },
+                statement: "A aorta abdominal se inicia no hiato aórtico do diafragma e termina bifurcando-se nas artérias ilíacas comuns. Qual dos seguintes pares de artérias são ramos viscerais PARES importantes da aorta abdominal, responsáveis pela irrigação de órgãos como os rins e as gônadas?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Tronco celíaco e artéria mesentérica superior.", value: "a" },
+                    { text: "Artérias renais e artérias gonadais (testiculares ou ovarianas).", value: "b" },
+                    { text: "Artérias mesentérica inferior e artérias lombares.", value: "c" },
+                    { text: "Artérias frênicas inferiores e artéria sacral mediana.", value: "d" },
+                    { text: "Artérias suprarrenais médias e artéria esplênica.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "As artérias renais e as artérias gonadais são ramos viscerais pares da aorta abdominal. O tronco celíaco, a mesentérica superior e a inferior são ramos viscerais ímpares. As lombares, sacral mediana e frênicas inferiores são ramos parietais."
+            },
+            // Questão 4
+            {
+                caseClinical: "Uma paciente realiza um hemograma de rotina que mostra: Leucócitos totais 7.500/mm³, Hemácias 4,8 milhões/mm³, Hemoglobina 14 g/dL, Hematócrito 42%, Plaquetas 280.000/mm³. A análise diferencial dos leucócitos no esfregaço sanguíneo está sendo realizada.",
+                image: { src: "https://www.unifal-mg.edu.br/histologiainterativa/wp-content/uploads/sites/38/2018/04/45-1024x768.jpg", alt: "Esfregaço sanguíneo com diferentes tipos celulares.", caption: "Fotomicrografia de esfregaço sanguíneo. (Seta 1 - linfócito; Seta 2 - neutrófilo; Seta 3 - eosinófilo; Seta 4 - eritrócito; Círculo 5 - plaqueta)." },
+                statement: "Com base na Imagem 4 e na sua identificação correta das células sanguíneas, analise as seguintes asserções sobre as características e funções dos elementos figurados do sangue:\nI. A célula apontada pela Seta 2 (neutrófilo) é o leucócito mais abundante na circulação, caracterizada por um núcleo multilobulado e citoplasma com granulações finas, sendo um fagócito essencial na resposta imune inata, especialmente contra infecções bacterianas.\nPORQUE\nII. Os eritrócitos (Seta 4) são células anucleadas bicôncavas ricas em hemoglobina, cuja principal função é o transporte de oxigênio dos pulmões para os tecidos, e sua forma otimiza a área de superfície para trocas gasosas e a flexibilidade para passar por capilares estreitos.",
+                type: "assertion-reason",
+                options: [
+                    { text: "As asserções I e II são proposições verdadeiras, e a II é uma justificativa correta da I.", value: "a" },
+                    { text: "As asserções I e II são proposições verdadeiras, mas a II não é uma justificativa correta da I.", value: "b" },
+                    { text: "A asserção I é uma proposição verdadeira, e a II é uma proposição falsa.", value: "c" },
+                    { text: "A asserção I é uma proposição falsa, e a II é uma proposição verdadeira.", value: "d" },
+                    { text: "As asserções I e II são proposições falsas.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "Ambas as asserções são verdadeiras e descrevem corretamente características dos neutrófilos (I) e eritrócitos (II). No entanto, a descrição dos eritrócitos (II) não justifica a descrição dos neutrófilos (I); são fatos independentes sobre tipos celulares distintos."
+            },
+            // Questão 5
+            {
+                caseClinical: "Uma paciente com histórico de febre reumática na infância desenvolve, anos depois, estenose mitral significativa. Ela apresenta dispneia aos esforços, fadiga e, eventualmente, sinais de congestão pulmonar. Em casos avançados, pode ocorrer sobrecarga e dilatação do átrio esquerdo.",
+                image: { src: "https://placehold.co/600x300/e2e8f0/64748b?text=Histologia+Valva+Cardíaca", alt: "Corte histológico de valva cardíaca.", caption: "Ilustração conceitual da estrutura histológica de uma valva cardíaca." },
+                statement: "As valvas cardíacas (mitral, tricúspide, aórtica e pulmonar) são estruturas avasculares cruciais para direcionar o fluxo sanguíneo unidirecionalmente. Qual é a composição histológica predominante das cúspides (ou folhetos) valvares cardíacas normais?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Músculo estriado cardíaco especializado, com capacidade contrátil.", value: "a" },
+                    { text: "Tecido conjuntivo denso não modelado rico em fibras colágenas, revestido por endotélio, com uma camada central de tecido conjuntivo frouxo contendo fibras elásticas.", value: "b" },
+                    { text: "Cartilagem hialina, conferindo rigidez.", value: "c" },
+                    { text: "Tecido adiposo unilocular, atuando como coxim.", value: "d" },
+                    { text: "Epitélio pavimentoso estratificado queratinizado.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "As cúspides valvares são compostas por um esqueleto de tecido conjuntivo denso (fibrosa), revestido por endotélio. Contêm também uma camada esponjosa e fibras elásticas, conferindo resistência e flexibilidade. Não possuem músculo cardíaco ativo, cartilagem, ou epitélio queratinizado."
+            },
+            // Questão 6
+            {
+                caseClinical: "Um paciente está sendo avaliado para uma possível síndrome do desfiladeiro torácico, uma condição na qual estruturas neurovasculares que passam entre a clavícula e a primeira costela podem ser comprimidas. A artéria subclávia é uma das estruturas que pode ser afetada.",
+                image: { src: "https://placehold.co/600x300/e2e8f0/64748b?text=Artéria+Subclávia+e+Axilar", alt: "Trajeto da artéria subclávia.", caption: "Esquema conceitual da artéria subclávia e sua transição para artéria axilar." },
+                statement: "A artéria subclávia é um importante vaso que supre o membro superior, pescoço e parte do encéfalo e tórax. Ao cruzar qual marco anatômico a artéria subclávia passa a ser denominada artéria axilar?",
+                type: "multiple-choice",
+                options: [
+                    { text: "A borda medial do músculo escaleno anterior.", value: "a" },
+                    { text: "O ápice da axila, após passar pelo canal cervicoaxilar.", value: "b" },
+                    { text: "A margem lateral da primeira costela.", value: "c" },
+                    { text: "A borda inferior do músculo redondo maior.", value: "d" },
+                    { text: "Ao emergir do arco aórtico ou tronco braquiocefálico.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "A artéria subclávia torna-se artéria axilar após cruzar a margem lateral (ou externa) da primeira costela. A borda inferior do músculo redondo maior é o ponto onde a artéria axilar se torna artéria braquial."
+            },
+            // Questão 7
+            {
+                caseClinical: "Um paciente com doença arterial periférica grave no membro inferior esquerdo necessita de um enxerto arterial para revascularização. O cirurgião vascular considera utilizar a veia safena magna contralateral como conduto.",
+                image: { src: "https://placehold.co/600x300/e2e8f0/64748b?text=Veia+Safena+Magna", alt: "Trajeto da veia safena magna.", caption: "Esquema conceitual do trajeto da veia safena magna no membro inferior." },
+                statement: "A veia safena magna é a veia superficial mais longa do corpo, frequentemente utilizada para enxertos vasculares. Qual é o seu trajeto típico no membro inferior, desde sua origem até sua terminação?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Origina-se na face lateral do pé, ascende posteriormente à fíbula e desemboca na veia poplítea.", value: "a" },
+                    { text: "Origina-se na face medial do arco dorsal do pé (anteriormente ao maléolo medial), ascende pela face medial da perna e coxa, e desemboca na veia femoral, no trígono femoral.", value: "b" },
+                    { text: "Origina-se na face posterior da panturrilha e desemboca diretamente na veia ilíaca externa.", value: "c" },
+                    { text: "Origina-se na região plantar profunda e desemboca na veia poplítea.", value: "d" },
+                    { text: "É uma veia profunda que corre paralela à artéria femoral.", value: "e" }
+                ],
+                correctAnswer: "b",
+                justification: "A veia safena magna origina-se da extremidade medial do arco venoso dorsal do pé, passa anteriormente ao maléolo medial, ascende pela face medial da perna e coxa, e desemboca na veia femoral no trígono femoral (hiato safeno)."
+            },
+            // Questão 8
+            {
+                caseClinical: "Um paciente com linfoma de Hodgkin realiza uma biópsia de um linfonodo cervical aumentado. O laudo histopatológico descreve a arquitetura do linfonodo, incluindo a presença de folículos linfoides na região cortical e cordões medulares na região medular.",
+                image: { src: "https://www.ufrgs.br/patologiageral/wp-content/uploads/2015/04/hiperplasia2.jpg", alt: "Estrutura histológica de um linfonodo mostrando folículos.", caption: "Fotomicrografia de tecido linfoide (linfonodo)." },
+                statement: "Os linfonodos são órgãos linfoides secundários essenciais para a resposta imune adaptativa. A linfa aferente entra no linfonodo através de múltiplos vasos linfáticos aferentes. Para qual região do linfonodo a linfa converge antes de sair por um ou poucos vasos linfáticos eferentes no hilo?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Diretamente para os folículos linfoides primários no córtex externo.", value: "a" },
+                    { text: "Para a zona paracortical, rica em linfócitos T.", value: "b" },
+                    { text: "Para os seios subcapsulares, depois para os seios trabeculares (ou corticais) e, finalmente, para os seios medulares, antes de atingir os vasos eferentes.", value: "c" },
+                    { text: "Para o centro germinativo dos folículos secundários.", value: "d" },
+                    { text: "Através de uma rede capilar sanguínea especializada na medula.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "A linfa entra pelos vasos aferentes no seio subcapsular, flui pelos seios trabeculares (corticais) e depois para os seios medulares. Destes, a linfa é coletada e sai pelos vasos eferentes no hilo do linfonodo."
+            },
+            // Questão 9
+            {
+                caseClinical: "Um paciente com sepse grave desenvolve \"síndrome do extravasamento capilar sistêmico\" (capillary leak syndrome), uma condição rara onde há aumento significativo da permeabilidade capilar sistêmica, levando a um grande extravasamento de plasma para o interstício.",
+                image: { src: "https://placehold.co/600x300/e2e8f0/64748b?text=Microcirculação+Capilar", alt: "Esquema da microcirculação e parede capilar.", caption: "Ilustração conceitual da parede capilar e junções interendoteliais." },
+                statement: "A parede dos capilares sanguíneos contínuos, o tipo mais comum, é formada por uma única camada de células endoteliais apoiadas em uma lâmina basal. Qual estrutura é primariamente responsável pela regulação seletiva da passagem de água, pequenos solutos e, em menor grau, proteínas, através da parede desses capilares em condições fisiológicas?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Pericitos contráteis que envolvem externamente os capilares.", value: "a" },
+                    { text: "As fenestrações presentes na membrana das células endoteliais.", value: "b" },
+                    { text: "As junções intercelulares (principalmente junções de oclusão e aderentes) entre as células endoteliais adjacentes e, em alguns casos, vesículas pinocíticas.", value: "c" },
+                    { text: "A espessura da lâmina basal, que atua como barreira física.", value: "d" },
+                    { text: "O glicocálix endotelial, que repele células sanguíneas.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "Nos capilares contínuos, a passagem de substâncias ocorre principalmente através das fendas intercelulares, reguladas pelas junções interendoteliais (oclusão e aderentes), e por transcitose via vesículas pinocíticas. Fenestrações são típicas de capilares fenestrados."
+            },
+            // Questão 10
+            {
+                caseClinical: "Um paciente com insuficiência cardíaca direita grave apresenta ascite e edema periférico. A pressão venosa central está elevada. O médico explica que o aumento da pressão hidrostática nos capilares sistêmicos é um fator contribuinte.",
+                image: { src: "https://placehold.co/600x300/e2e8f0/64748b?text=Forças+de+Starling", alt: "Esquema das Forças de Starling no capilar.", caption: "Ilustração conceitual das Forças de Starling." },
+                statement: "De acordo com o equilíbrio de Starling, a movimentação de fluidos entre o plasma e o interstício é determinada pelo balanço entre pressões hidrostáticas e oncóticas. Qual das seguintes condições levaria a um AUMENTO da filtração de fluido do capilar para o interstício, favorecendo a formação de edema?",
+                type: "multiple-choice",
+                options: [
+                    { text: "Aumento da pressão oncótica plasmática e diminuição da pressão hidrostática capilar.", value: "a" },
+                    { text: "Diminuição da pressão hidrostática capilar e aumento da pressão oncótica intersticial.", value: "b" },
+                    { text: "Aumento da pressão hidrostática capilar e/ou diminuição da pressão oncótica plasmática.", value: "c" },
+                    { text: "Diminuição da pressão oncótica intersticial e aumento da pressão hidrostática intersticial.", value: "d" },
+                    { text: "Aumento da pressão oncótica plasmática e aumento da pressão hidrostática intersticial.", value: "e" }
+                ],
+                correctAnswer: "c",
+                justification: "A filtração de fluido do capilar para o interstício (edema) é favorecida pelo aumento da pressão hidrostática capilar (Pc), que 'empurra' o fluido para fora, e/ou pela diminuição da pressão oncótica plasmática (πp), que reduz a força que 'segura' o fluido dentro do capilar."
+            }
+        ];
+
+        // Variáveis globais do quiz
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answerConfirmed = false; 
+
+        // Elementos do DOM (serão obtidos na inicialização)
+        let quizContainer;
+        let nextQuestionBtn;
+        let quizResultContainer;
+        let scoreElement;
+        let percentageElement;
+        let encouragementMessageElement;
+        let nextSessionLink; 
+
+        /**
+         * Exibe a questão atual na tela.
+         * @param {number} index - O índice da questão a ser exibida.
+         */
+        function displayQuestion(index) {
+            answerConfirmed = false; 
+            const q = questions[index];
+            let optionsHtml = '';
+
+            if (!q) { 
+                console.error("Questão não encontrada no índice:", index);
+                if (questions.length > 0) { 
+                     showResults();
+                } else { 
+                    if(quizContainer) quizContainer.innerHTML = "<p class='text-center text-red-500'>Nenhuma questão carregada para este quiz.</p>";
+                }
+                return;
+            }
+
+            if (q.type === "multiple-choice" || q.type === "assertion-reason") {
+                q.options.forEach(option => {
+                    optionsHtml += `
+                        <label class="block bg-slate-50 hover:bg-sky-100 p-4 rounded-lg border border-slate-200 mb-3 cursor-pointer transition-colors duration-200">
+                            <input type="radio" name="question${index}" value="${option.value}" class="custom-radio">
+                            <span class="text-slate-700">${option.text}</span>
+                        </label>
+                    `;
+                });
+            }
+            // Adicionar lógica para outros tipos de questão se necessário (ex: true-false)
+            
+            if(quizContainer) { 
+                quizContainer.innerHTML = `
+                    <div class="question-card bg-white p-6 sm:p-8 rounded-xl shadow-xl" id="q_card_${index}">
+                        <p class="text-sm text-slate-500 mb-1">Questão ${index + 1} de ${questions.length}</p>
+                        ${q.caseClinical ? `<div class="mb-4 p-4 bg-sky-50 rounded-md text-slate-700 text-sm sm:text-base italic">${q.caseClinical}</div>` : ''}
+                        ${q.image ? `
+                            <div class="my-4 text-center">
+                                <img src="${q.image.src}" alt="${q.image.alt}" class="max-w-full h-auto mx-auto rounded-lg shadow-sm border border-slate-200" onerror="this.onerror=null; this.src='https://placehold.co/600x300/e2e8f0/64748b?text=Imagem+Indisponível'; this.alt='Imagem indisponível';">
+                                ${q.image.caption ? `<p class="text-xs text-slate-500 mt-2">${q.image.caption}</p>` : ''}
+                            </div>` : ''}
+                        <p class="font-semibold text-slate-800 mb-5 text-base sm:text-lg whitespace-pre-line">${q.statement}</p>
+                        <div class="options-container">${optionsHtml}</div>
+                        <button onclick="confirmAnswer(${index})" class="confirm-btn mt-6 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md transition-colors duration-300">
+                            Confirmar Resposta
+                        </button>
+                        <div class="feedback-area mt-4 p-4 rounded-md hidden text-sm sm:text-base"></div>
+                    </div>
+                `;
+            }
+            if(nextQuestionBtn) nextQuestionBtn.classList.add('hidden'); 
+            
+            const cardElement = document.getElementById(`q_card_${index}`);
+            if (cardElement) {
+                 cardElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        /**
+         * Confirma a resposta do usuário, calcula a pontuação e exibe o feedback.
+         * @param {number} index - O índice da questão atual.
+         */
+        function confirmAnswer(index) {
+            if (answerConfirmed) return; 
+
+            const q = questions[index];
+            if (!q) { 
+                console.error("Tentativa de confirmar resposta para questão inexistente:", index);
+                return;
+            }
+            const feedbackDiv = quizContainer ? quizContainer.querySelector(`#q_card_${index} .feedback-area`) : null;
+            const confirmBtn = quizContainer ? quizContainer.querySelector(`#q_card_${index} .confirm-btn`) : null;
+            let isCorrect = false;
+            
+            if (q.type === "multiple-choice" || q.type === "assertion-reason") {
+                const selectedOption = quizContainer ? quizContainer.querySelector(`input[name="question${index}"]:checked`) : null;
+                if (!selectedOption) { 
+                    if (feedbackDiv) {
+                        feedbackDiv.innerHTML = '<p class="font-semibold">Por favor, selecione uma alternativa.</p>';
+                        feedbackDiv.className = 'feedback-area mt-4 p-4 rounded-md bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700';
+                        feedbackDiv.classList.remove('hidden');
+                    }
+                    return;
+                }
+                isCorrect = selectedOption.value === q.correctAnswer;
+            }
+            // Adicionar lógica para outros tipos de questão se necessário
+            
+            if (feedbackDiv) { 
+                if (isCorrect) {
+                    score++;
+                    feedbackDiv.innerHTML = `<p class="font-semibold mb-1">Resposta Correta!</p><p>${q.justification}</p>`;
+                    feedbackDiv.className = 'feedback-area mt-4 p-4 rounded-md feedback-correct';
+                } else {
+                    feedbackDiv.innerHTML = `<p class="font-semibold mb-1">Resposta Incorreta.</p><p><strong>Justificativa:</strong> ${q.justification}</p>`;
+                    feedbackDiv.className = 'feedback-area mt-4 p-4 rounded-md feedback-incorrect';
+                }
+                feedbackDiv.classList.remove('hidden');
+            }
+
+            if (confirmBtn) { 
+                confirmBtn.disabled = true; 
+                confirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+            answerConfirmed = true; 
+
+            if (quizContainer) {
+                const inputs = quizContainer.querySelectorAll(`#q_card_${index} input[type="radio"]`);
+                inputs.forEach(input => input.disabled = true);
+            }
+
+            if (currentQuestionIndex < questions.length - 1) {
+                if(nextQuestionBtn) nextQuestionBtn.classList.remove('hidden');
+            } else {
+                showResults();
+            }
+        }
+
+        /**
+         * Manipula o clique no botão "Próxima Questão".
+         */
+        function handleNextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                displayQuestion(currentQuestionIndex);
+            }
+        }
+        
+        /**
+         * Exibe o resultado final do quiz.
+         */
+        function showResults() {
+            if (quizContainer) quizContainer.classList.add('hidden'); 
+            if (nextQuestionBtn) nextQuestionBtn.classList.add('hidden'); 
+            if (quizResultContainer) quizResultContainer.classList.remove('hidden');
+            
+            if (questions.length > 0) { 
+                 const calculatedPercentage = (score / questions.length) * 100;
+                 if (scoreElement) scoreElement.textContent = `Você acertou ${score} de ${questions.length} questões.`;
+                 if (percentageElement) percentageElement.textContent = `Seu aproveitamento: ${calculatedPercentage.toFixed(1)}%`;
+                 
+                 if (encouragementMessageElement) {
+                    if (calculatedPercentage >= 70) {
+                        encouragementMessageElement.textContent = "Excelente trabalho! Continue assim para a próxima sessão.";
+                    } else if (calculatedPercentage >= 50) {
+                        encouragementMessageElement.textContent = "Bom esforço! Reveja os pontos que errou e siga em frente.";
+                    } else {
+                        encouragementMessageElement.textContent = "Não desanime! A revisão é chave para o aprendizado. Tente novamente!";
+                    }
+                 }
+
+            } else {
+                if (scoreElement) scoreElement.textContent = "Nenhuma questão foi carregada.";
+                if (percentageElement) percentageElement.textContent = "Aproveitamento: N/A";
+                if (encouragementMessageElement) encouragementMessageElement.textContent = "Não há questões nesta sessão.";
+            }
+            
+            // Configura o link da próxima sessão
+            if (nextSessionLink) {
+                 // Link para SOI I - Sessão 3 (Respiratório: Estrutura e Mecânica)
+                nextSessionLink.href = "soi_i_2bim_s3_resp_mecanica.html";
+                nextSessionLink.textContent = "Próxima Sessão (Respiratório: Estrutura e Mecânica)";
+            }
+
+
+            if (quizResultContainer) {
+                quizResultContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // Inicia o Quiz exibindo a primeira questão, se houver alguma.
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeQuizSession();
+        });
+
+        function initializeQuizSession() {
+            quizContainer = document.getElementById('quiz-container');
+            nextQuestionBtn = document.getElementById('next-question-btn');
+            quizResultContainer = document.getElementById('quiz-result');
+            scoreElement = document.getElementById('score');
+            percentageElement = document.getElementById('percentage');
+            encouragementMessageElement = document.getElementById('encouragement-message');
+            nextSessionLink = document.getElementById('next-session-link'); 
+
+            currentQuestionIndex = 0;
+            score = 0;
+            answerConfirmed = false;
+
+            if (quizResultContainer) quizResultContainer.classList.add('hidden');
+            if (nextQuestionBtn) {
+                 nextQuestionBtn.classList.add('hidden');
+                 nextQuestionBtn.addEventListener('click', handleNextQuestion); // Adiciona listener aqui
+            }
+            if (quizContainer) quizContainer.classList.remove('hidden');
+
+            if (questions && questions.length > 0) {
+                displayQuestion(currentQuestionIndex);
+            } else {
+                if (quizContainer) {
+                    quizContainer.innerHTML = "<p class='text-center text-xl text-slate-700 mt-10'>Nenhuma questão disponível para esta sessão no momento.</p>";
+                }
+                showResults();
+            }
+        }
+    </script>
+
+</body>
+</html>
